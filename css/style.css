@@ -3094,3 +3094,98 @@ body.mode-my-tpls .step-bar {
     max-width: 360px;
   }
 }
+
+/* ===== Sezione COLORA — galleria, upload, step-bar 2 step ===== */
+#step-colora {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px 80px;
+}
+
+.colora-loading,
+.colora-empty {
+  text-align: center;
+  color: #6c5b8a;
+  font-size: 16px;
+  padding: 32px 16px;
+}
+.colora-empty {
+  background: #FFF8F0;
+  border: 2px dashed #E0CFF7;
+  border-radius: 16px;
+}
+
+.colora-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.colora-filter {
+  background: #FFF;
+  border: 2px solid #E0CFF7;
+  color: #6c5b8a;
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  font: 600 14px 'Quicksand', sans-serif;
+  transition: all 0.15s ease;
+}
+.colora-filter:hover { background: #F4ECFF; }
+.colora-filter.active {
+  background: linear-gradient(135deg, #FF6B9D, #C77DFF);
+  border-color: transparent;
+  color: #FFF;
+}
+
+.colora-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+}
+.colora-card {
+  background: #FFF;
+  border: 3px solid #E0CFF7;
+  border-radius: 16px;
+  padding: 18px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.colora-card:hover,
+.colora-card:focus-visible {
+  transform: translateY(-4px);
+  border-color: #C77DFF;
+  box-shadow: 0 8px 20px rgba(199, 125, 255, 0.25);
+  outline: none;
+}
+.colora-card-emoji { font-size: 42px; line-height: 1; }
+.colora-card-name {
+  font: 600 14px 'Baloo 2', sans-serif;
+  color: #2A2438;
+  text-align: center;
+}
+
+.colora-upload-row {
+  display: flex;
+  justify-content: center;
+  margin: 28px 0 8px;
+}
+#btn-colora-upload {
+  font-size: 16px;
+  padding: 12px 22px;
+}
+
+@media (max-width: 600px) {
+  .colora-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+  }
+  .colora-card { padding: 12px 8px; }
+  .colora-card-emoji { font-size: 32px; }
+  .colora-card-name { font-size: 13px; }
+}
