@@ -1445,13 +1445,14 @@ window.TEMPLATES = {
   /* =====================================================
      INVITO  (800 x 566 — A6 landscape, 1/4 di A4)
      Tre campi: festeggiato | quando | dove
+     5 temi (Compleanno, Natale, Animali, Spazio, Unicorno)
      ===================================================== */
   invito: [
 
-    /* --- 1. Palloncini e torta --- */
+    /* --- 1. Compleanno --- */
     {
-      nome: 'Palloncini e torta',
-      emoji: '🎈',
+      nome: 'Compleanno',
+      emoji: '🎂',
       background: 'linear-gradient(135deg, #FFE5EC 0%, #FFD6A5 60%, #FFF4CC 100%)',
       coloreAccento: '#FF6B9D',
       svg: `<svg viewBox="0 0 800 566" xmlns="http://www.w3.org/2000/svg" class="template-svg" preserveAspectRatio="none">
@@ -1539,6 +1540,356 @@ window.TEMPLATES = {
         <rect data-text-zone="festeggiato|quando|dove"
               x="260" y="240" width="460" height="190" rx="20"
               fill="#FFFFFF" opacity="0.55"/>
+      </svg>`
+    },
+
+    /* --- 2. Natale --- */
+    {
+      nome: 'Natale',
+      emoji: '🎄',
+      background: 'linear-gradient(135deg, #C8E6D0 0%, #FFF4CC 60%, #FFD6D6 100%)',
+      coloreAccento: '#2E7D5C',
+      svg: `<svg viewBox="0 0 800 566" xmlns="http://www.w3.org/2000/svg" class="template-svg" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="natBg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stop-color="#C8E6D0"/>
+            <stop offset="60%"  stop-color="#FFF4CC"/>
+            <stop offset="100%" stop-color="#FFD6D6"/>
+          </linearGradient>
+        </defs>
+
+        <rect width="800" height="566" fill="url(#natBg)"/>
+        <rect x="14" y="14" width="772" height="538" rx="22" fill="none" stroke="#2E7D5C" stroke-width="3" stroke-dasharray="2 9" opacity="0.55"/>
+
+        <!-- fiocchi di neve sparsi -->
+        <circle cx="65"  cy="60"  r="4" fill="#FFFFFF"/>
+        <circle cx="120" cy="160" r="3" fill="#FFFFFF"/>
+        <circle cx="55"  cy="280" r="4" fill="#FFFFFF"/>
+        <circle cx="95"  cy="420" r="3" fill="#FFFFFF"/>
+        <circle cx="745" cy="55"  r="4" fill="#FFFFFF"/>
+        <circle cx="715" cy="180" r="3" fill="#FFFFFF"/>
+        <circle cx="755" cy="310" r="4" fill="#FFFFFF"/>
+        <circle cx="725" cy="445" r="3" fill="#FFFFFF"/>
+        <circle cx="430" cy="80"  r="3" fill="#FFFFFF"/>
+        <circle cx="380" cy="40"  r="3" fill="#FFFFFF"/>
+        <circle cx="510" cy="50"  r="3" fill="#FFFFFF"/>
+
+        <!-- ALBERO DI NATALE a sinistra -->
+        <!-- stella in punta -->
+        <path d="M 145 90 l 6 14 l 15 1 l -12 9 l 4 14 l -13 -8 l -13 8 l 4 -14 l -12 -9 l 15 -1 z" fill="#FFD93D" stroke="#E5B92F" stroke-width="1"/>
+        <!-- chioma top -->
+        <polygon points="145,130 95,210 195,210" fill="#2E7D5C"/>
+        <!-- chioma medium -->
+        <polygon points="145,180 80,280 210,280" fill="#3A8E6D"/>
+        <!-- chioma base -->
+        <polygon points="145,250 60,380 230,380" fill="#2E7D5C"/>
+        <!-- tronco -->
+        <rect x="128" y="380" width="34" height="34" fill="#8B5A2B"/>
+        <!-- decorazioni: palline colorate -->
+        <circle cx="125" cy="200" r="6" fill="#FF6B9D"/>
+        <circle cx="165" cy="195" r="6" fill="#FFD93D"/>
+        <circle cx="110" cy="240" r="6" fill="#C77DFF"/>
+        <circle cx="180" cy="245" r="6" fill="#FFD93D"/>
+        <circle cx="95"  cy="310" r="7" fill="#FF6B9D"/>
+        <circle cx="145" cy="320" r="7" fill="#FFD93D"/>
+        <circle cx="195" cy="315" r="7" fill="#C77DFF"/>
+        <circle cx="80"  cy="360" r="7" fill="#FFD93D"/>
+        <circle cx="210" cy="365" r="7" fill="#FF6B9D"/>
+
+        <!-- REGALI in basso a destra -->
+        <!-- regalo grande -->
+        <rect x="600" y="400" width="120" height="90" fill="#FF6B9D"/>
+        <rect x="650" y="400" width="20" height="90" fill="#FFD93D"/>
+        <rect x="600" y="435" width="120" height="20" fill="#FFD93D"/>
+        <path d="M 660 400 Q 640 380 645 400 M 660 400 Q 680 380 675 400" stroke="#FFD93D" stroke-width="6" fill="none" stroke-linecap="round"/>
+        <!-- regalo medio -->
+        <rect x="540" y="430" width="70" height="60" fill="#C77DFF"/>
+        <rect x="568" y="430" width="14" height="60" fill="#FFFFFF"/>
+        <rect x="540" y="453" width="70" height="14" fill="#FFFFFF"/>
+        <!-- regalo piccolo -->
+        <rect x="730" y="445" width="55" height="45" fill="#2E7D5C"/>
+        <rect x="750" y="445" width="14" height="45" fill="#FFD93D"/>
+        <rect x="730" y="460" width="55" height="14" fill="#FFD93D"/>
+
+        <!-- agrifoglio decorativo in alto -->
+        <path d="M 580 60 Q 600 50 610 70 Q 600 90 580 80 Q 570 70 580 60 Z" fill="#2E7D5C"/>
+        <path d="M 610 70 Q 630 60 640 80 Q 630 100 610 90 Q 600 80 610 70 Z" fill="#3A8E6D"/>
+        <circle cx="595" cy="85"  r="6" fill="#D32F2F"/>
+        <circle cx="615" cy="92"  r="6" fill="#D32F2F"/>
+        <circle cx="605" cy="78"  r="5" fill="#D32F2F"/>
+
+        <!-- titolo -->
+        <text x="285" y="220" font-family="Pacifico, cursive" font-size="40" fill="#D32F2F" opacity="0.95">Sei invitato!</text>
+
+        <!-- zona testo -->
+        <rect data-text-zone="festeggiato|quando|dove"
+              x="260" y="240" width="460" height="190" rx="20"
+              fill="#FFFFFF" opacity="0.6"/>
+      </svg>`
+    },
+
+    /* --- 3. Animali --- */
+    {
+      nome: 'Animali',
+      emoji: '🐾',
+      background: 'linear-gradient(135deg, #D9F0C4 0%, #FFF4CC 60%, #FFE5B5 100%)',
+      coloreAccento: '#8B5A2B',
+      svg: `<svg viewBox="0 0 800 566" xmlns="http://www.w3.org/2000/svg" class="template-svg" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="aniBg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stop-color="#D9F0C4"/>
+            <stop offset="60%"  stop-color="#FFF4CC"/>
+            <stop offset="100%" stop-color="#FFE5B5"/>
+          </linearGradient>
+        </defs>
+
+        <rect width="800" height="566" fill="url(#aniBg)"/>
+        <rect x="14" y="14" width="772" height="538" rx="22" fill="none" stroke="#8B5A2B" stroke-width="3" stroke-dasharray="2 9" opacity="0.5"/>
+
+        <!-- ZAMPETTE sparse in background (decorative paw prints) -->
+        <g fill="#8B5A2B" opacity="0.18">
+          <g transform="translate(70,90) rotate(-15)">
+            <ellipse cx="0"   cy="0"   rx="12" ry="14"/>
+            <ellipse cx="-12" cy="-15" rx="5"  ry="6"/>
+            <ellipse cx="-2"  cy="-22" rx="5"  ry="6"/>
+            <ellipse cx="10"  cy="-20" rx="5"  ry="6"/>
+            <ellipse cx="16"  cy="-9"  rx="5"  ry="6"/>
+          </g>
+          <g transform="translate(110,470) rotate(20)">
+            <ellipse cx="0"   cy="0"   rx="12" ry="14"/>
+            <ellipse cx="-12" cy="-15" rx="5"  ry="6"/>
+            <ellipse cx="-2"  cy="-22" rx="5"  ry="6"/>
+            <ellipse cx="10"  cy="-20" rx="5"  ry="6"/>
+            <ellipse cx="16"  cy="-9"  rx="5"  ry="6"/>
+          </g>
+          <g transform="translate(720,440) rotate(-25)">
+            <ellipse cx="0"   cy="0"   rx="12" ry="14"/>
+            <ellipse cx="-12" cy="-15" rx="5"  ry="6"/>
+            <ellipse cx="-2"  cy="-22" rx="5"  ry="6"/>
+            <ellipse cx="10"  cy="-20" rx="5"  ry="6"/>
+            <ellipse cx="16"  cy="-9"  rx="5"  ry="6"/>
+          </g>
+          <g transform="translate(740,110) rotate(10)">
+            <ellipse cx="0"   cy="0"   rx="12" ry="14"/>
+            <ellipse cx="-12" cy="-15" rx="5"  ry="6"/>
+            <ellipse cx="-2"  cy="-22" rx="5"  ry="6"/>
+            <ellipse cx="10"  cy="-20" rx="5"  ry="6"/>
+            <ellipse cx="16"  cy="-9"  rx="5"  ry="6"/>
+          </g>
+        </g>
+
+        <!-- GATTO in basso a sinistra -->
+        <ellipse cx="135" cy="475" rx="60" ry="42" fill="#FFB088"/>
+        <circle  cx="135" cy="420" r="38" fill="#FFB088"/>
+        <polygon points="105,395 100,365 125,388" fill="#FFB088"/>
+        <polygon points="165,395 170,365 145,388" fill="#FFB088"/>
+        <polygon points="108,393 105,377 119,388" fill="#FF8AAE"/>
+        <polygon points="162,393 165,377 151,388" fill="#FF8AAE"/>
+        <circle cx="122" cy="418" r="3" fill="#2A2438"/>
+        <circle cx="148" cy="418" r="3" fill="#2A2438"/>
+        <path d="M 130 432 Q 135 437 140 432" stroke="#2A2438" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <polygon points="133,427 137,427 135,430" fill="#FF6B9D"/>
+        <!-- baffi -->
+        <line x1="105" y1="425" x2="85"  y2="420" stroke="#2A2438" stroke-width="1"/>
+        <line x1="105" y1="430" x2="85"  y2="432" stroke="#2A2438" stroke-width="1"/>
+        <line x1="165" y1="425" x2="185" y2="420" stroke="#2A2438" stroke-width="1"/>
+        <line x1="165" y1="430" x2="185" y2="432" stroke="#2A2438" stroke-width="1"/>
+        <!-- coda -->
+        <path d="M 190 470 Q 230 460 240 420 Q 245 400 230 395" stroke="#FFB088" stroke-width="14" fill="none" stroke-linecap="round"/>
+
+        <!-- CANE in basso a destra -->
+        <ellipse cx="660" cy="490" rx="62" ry="38" fill="#C19A6B"/>
+        <circle  cx="660" cy="440" r="36" fill="#C19A6B"/>
+        <!-- orecchie pendenti -->
+        <ellipse cx="628" cy="430" rx="14" ry="26" fill="#8B5A2B" transform="rotate(-20 628 430)"/>
+        <ellipse cx="692" cy="430" rx="14" ry="26" fill="#8B5A2B" transform="rotate(20 692 430)"/>
+        <circle cx="648" cy="436" r="3" fill="#2A2438"/>
+        <circle cx="672" cy="436" r="3" fill="#2A2438"/>
+        <ellipse cx="660" cy="452" rx="6" ry="5" fill="#2A2438"/>
+        <path d="M 655 460 Q 660 465 665 460" stroke="#2A2438" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <!-- coda scodinzolante -->
+        <path d="M 718 480 Q 745 460 740 430" stroke="#C19A6B" stroke-width="12" fill="none" stroke-linecap="round"/>
+
+        <!-- cuoricini tra i due -->
+        <path d="M 400 460 Q 396 454 402 452 Q 408 454 404 460 L 400 466 Z" fill="#FF6B9D" opacity="0.7"/>
+        <path d="M 380 500 Q 376 494 382 492 Q 388 494 384 500 L 380 506 Z" fill="#FF6B9D" opacity="0.55"/>
+        <path d="M 420 510 Q 416 504 422 502 Q 428 504 424 510 L 420 516 Z" fill="#FF6B9D" opacity="0.55"/>
+
+        <!-- titolo -->
+        <text x="270" y="220" font-family="Pacifico, cursive" font-size="40" fill="#8B5A2B" opacity="0.95">Sei invitato!</text>
+
+        <!-- zona testo -->
+        <rect data-text-zone="festeggiato|quando|dove"
+              x="260" y="240" width="460" height="190" rx="20"
+              fill="#FFFFFF" opacity="0.6"/>
+      </svg>`
+    },
+
+    /* --- 4. Spazio --- */
+    {
+      nome: 'Spazio',
+      emoji: '🚀',
+      background: 'linear-gradient(135deg, #1A1B4B 0%, #3B2C7A 60%, #6B4A9E 100%)',
+      coloreAccento: '#FFD93D',
+      svg: `<svg viewBox="0 0 800 566" xmlns="http://www.w3.org/2000/svg" class="template-svg" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="spcBg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stop-color="#1A1B4B"/>
+            <stop offset="60%"  stop-color="#3B2C7A"/>
+            <stop offset="100%" stop-color="#6B4A9E"/>
+          </linearGradient>
+          <radialGradient id="spcSun" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"  stop-color="#FFE070"/>
+            <stop offset="70%" stop-color="#FFA940"/>
+            <stop offset="100%" stop-color="#FF6B3D"/>
+          </radialGradient>
+        </defs>
+
+        <rect width="800" height="566" fill="url(#spcBg)"/>
+        <rect x="14" y="14" width="772" height="538" rx="22" fill="none" stroke="#FFD93D" stroke-width="3" stroke-dasharray="2 9" opacity="0.55"/>
+
+        <!-- stelline sparse -->
+        <g fill="#FFFFFF">
+          <circle cx="55"  cy="50"  r="2"/>
+          <circle cx="120" cy="90"  r="1.5"/>
+          <circle cx="70"  cy="160" r="2"/>
+          <circle cx="40"  cy="240" r="1.5"/>
+          <circle cx="100" cy="330" r="2"/>
+          <circle cx="55"  cy="420" r="1.5"/>
+          <circle cx="135" cy="500" r="2"/>
+          <circle cx="380" cy="40"  r="2"/>
+          <circle cx="450" cy="80"  r="1.5"/>
+          <circle cx="500" cy="50"  r="2"/>
+          <circle cx="730" cy="80"  r="2"/>
+          <circle cx="760" cy="160" r="1.5"/>
+          <circle cx="720" cy="260" r="2"/>
+          <circle cx="755" cy="390" r="1.5"/>
+          <circle cx="710" cy="500" r="2"/>
+        </g>
+        <!-- stelle a 4 punte -->
+        <path d="M 90 100 l 3 7 l 7 1 l -6 4 l 2 7 l -6 -4 l -6 4 l 2 -7 l -6 -4 l 7 -1 z" fill="#FFD93D"/>
+        <path d="M 440 30 l 2 6 l 6 1 l -5 3 l 1 6 l -4 -3 l -4 3 l 1 -6 l -5 -3 l 6 -1 z" fill="#FFD93D"/>
+        <path d="M 700 350 l 3 7 l 7 1 l -6 4 l 2 7 l -6 -4 l -6 4 l 2 -7 l -6 -4 l 7 -1 z" fill="#FFD93D"/>
+
+        <!-- LUNA in alto a sinistra -->
+        <circle cx="140" cy="120" r="50" fill="#F0E0C0"/>
+        <circle cx="140" cy="120" r="50" fill="#D0BFA0" opacity="0.3"/>
+        <circle cx="118" cy="105" r="6"  fill="#B8A88A" opacity="0.5"/>
+        <circle cx="155" cy="135" r="8"  fill="#B8A88A" opacity="0.5"/>
+        <circle cx="130" cy="142" r="4"  fill="#B8A88A" opacity="0.5"/>
+
+        <!-- PIANETA con anello in alto a destra -->
+        <ellipse cx="680" cy="180" rx="72" ry="14" fill="none" stroke="#FFD93D" stroke-width="3" opacity="0.7" transform="rotate(-18 680 180)"/>
+        <circle cx="680" cy="180" r="40" fill="url(#spcSun)"/>
+        <ellipse cx="680" cy="180" rx="72" ry="14" fill="none" stroke="#FFD93D" stroke-width="3" opacity="0.9" transform="rotate(-18 680 180)" stroke-dasharray="100 200"/>
+
+        <!-- RAZZO in basso al centro-sinistra -->
+        <g transform="translate(180,420) rotate(-15)">
+          <!-- corpo razzo -->
+          <path d="M 0 -50 Q 18 -40 18 0 L 18 50 L -18 50 L -18 0 Q -18 -40 0 -50 Z" fill="#E8E8E8"/>
+          <!-- punta -->
+          <path d="M 0 -50 Q 18 -40 18 0 L -18 0 Q -18 -40 0 -50 Z" fill="#FF6B9D"/>
+          <!-- oblò -->
+          <circle cx="0" cy="-10" r="9" fill="#7BC8FF" stroke="#FFFFFF" stroke-width="2"/>
+          <!-- alette -->
+          <polygon points="-18,30 -32,55 -18,55" fill="#FF6B9D"/>
+          <polygon points="18,30 32,55 18,55" fill="#FF6B9D"/>
+          <!-- fiamma -->
+          <path d="M -10 50 Q -5 70 0 75 Q 5 70 10 50 Z" fill="#FFA940"/>
+          <path d="M -5 50 Q 0 65 5 50 Z" fill="#FFE070"/>
+        </g>
+
+        <!-- titolo -->
+        <text x="285" y="220" font-family="Pacifico, cursive" font-size="40" fill="#FFD93D" opacity="0.98">Sei invitato!</text>
+
+        <!-- zona testo -->
+        <rect data-text-zone="festeggiato|quando|dove"
+              x="260" y="240" width="460" height="190" rx="20"
+              fill="#FFFFFF" opacity="0.65"/>
+      </svg>`
+    },
+
+    /* --- 5. Unicorno --- */
+    {
+      nome: 'Unicorno',
+      emoji: '🦄',
+      background: 'linear-gradient(135deg, #FFD6E7 0%, #E0D0FF 50%, #CCE8FF 100%)',
+      coloreAccento: '#C77DFF',
+      svg: `<svg viewBox="0 0 800 566" xmlns="http://www.w3.org/2000/svg" class="template-svg" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="uniBg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stop-color="#FFD6E7"/>
+            <stop offset="50%"  stop-color="#E0D0FF"/>
+            <stop offset="100%" stop-color="#CCE8FF"/>
+          </linearGradient>
+          <linearGradient id="uniRainbow" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%"   stop-color="#FF6B9D"/>
+            <stop offset="25%"  stop-color="#FFA940"/>
+            <stop offset="50%"  stop-color="#FFD93D"/>
+            <stop offset="75%"  stop-color="#80E5C5"/>
+            <stop offset="100%" stop-color="#C77DFF"/>
+          </linearGradient>
+        </defs>
+
+        <rect width="800" height="566" fill="url(#uniBg)"/>
+        <rect x="14" y="14" width="772" height="538" rx="22" fill="none" stroke="#C77DFF" stroke-width="3" stroke-dasharray="2 9" opacity="0.55"/>
+
+        <!-- ARCOBALENO in alto a destra -->
+        <g transform="translate(700,200)">
+          <path d="M -90 0 A 90 90 0 0 1 90 0" fill="none" stroke="#FF6B9D" stroke-width="12"/>
+          <path d="M -75 0 A 75 75 0 0 1 75 0" fill="none" stroke="#FFA940" stroke-width="12"/>
+          <path d="M -60 0 A 60 60 0 0 1 60 0" fill="none" stroke="#FFD93D" stroke-width="12"/>
+          <path d="M -45 0 A 45 45 0 0 1 45 0" fill="none" stroke="#80E5C5" stroke-width="12"/>
+          <path d="M -30 0 A 30 30 0 0 1 30 0" fill="none" stroke="#7BC8FF" stroke-width="12"/>
+          <path d="M -15 0 A 15 15 0 0 1 15 0" fill="none" stroke="#C77DFF" stroke-width="12"/>
+        </g>
+        <!-- nuvolette ai piedi dell'arcobaleno -->
+        <ellipse cx="600" cy="205" rx="28" ry="14" fill="#FFFFFF" opacity="0.95"/>
+        <ellipse cx="613" cy="198" rx="20" ry="12" fill="#FFFFFF" opacity="0.95"/>
+        <ellipse cx="800" cy="205" rx="28" ry="14" fill="#FFFFFF" opacity="0.95"/>
+        <ellipse cx="787" cy="198" rx="20" ry="12" fill="#FFFFFF" opacity="0.95"/>
+
+        <!-- UNICORNO in basso a sinistra (silhouette stilizzata) -->
+        <g transform="translate(150,430)">
+          <!-- corpo -->
+          <ellipse cx="0" cy="0" rx="70" ry="38" fill="#FFFFFF" stroke="#C77DFF" stroke-width="2"/>
+          <!-- gambe -->
+          <rect x="-50" y="20" width="12" height="55" fill="#FFFFFF" stroke="#C77DFF" stroke-width="2"/>
+          <rect x="-25" y="25" width="12" height="50" fill="#FFFFFF" stroke="#C77DFF" stroke-width="2"/>
+          <rect x="15"  y="25" width="12" height="50" fill="#FFFFFF" stroke="#C77DFF" stroke-width="2"/>
+          <rect x="40"  y="20" width="12" height="55" fill="#FFFFFF" stroke="#C77DFF" stroke-width="2"/>
+          <!-- collo + testa -->
+          <path d="M -60 -10 Q -75 -50 -100 -55 Q -120 -55 -115 -30 Q -110 -10 -85 0 Z" fill="#FFFFFF" stroke="#C77DFF" stroke-width="2"/>
+          <!-- orecchio -->
+          <polygon points="-100,-55 -97,-72 -90,-58" fill="#FFFFFF" stroke="#C77DFF" stroke-width="2"/>
+          <!-- corno -->
+          <polygon points="-110,-55 -103,-85 -98,-58" fill="#FFD93D" stroke="#E5B92F" stroke-width="1.5"/>
+          <!-- occhio -->
+          <circle cx="-103" cy="-42" r="2.5" fill="#2A2438"/>
+          <!-- guancia rosa -->
+          <circle cx="-108" cy="-32" r="4" fill="#FFB5D8" opacity="0.7"/>
+          <!-- criniera (multi-colore) -->
+          <path d="M -90 -50 Q -75 -65 -55 -55 Q -50 -40 -65 -30 Q -85 -35 -90 -50 Z" fill="#FF6B9D"/>
+          <path d="M -70 -45 Q -55 -55 -40 -45 Q -35 -30 -50 -20 Q -65 -28 -70 -45 Z" fill="#C77DFF"/>
+          <path d="M -50 -35 Q -35 -42 -20 -28 Q -18 -10 -35 -10 Q -50 -18 -50 -35 Z" fill="#80E5C5"/>
+          <!-- coda -->
+          <path d="M 70 -5 Q 100 -15 105 10 Q 110 35 90 30 Q 75 15 70 -5 Z" fill="#FF6B9D"/>
+          <path d="M 85 5 Q 110 5 110 30 Q 100 40 85 25 Z" fill="#C77DFF"/>
+        </g>
+
+        <!-- stelline magiche sparse -->
+        <path d="M 380 90 l 3 7 l 7 1 l -6 4 l 2 7 l -6 -4 l -6 4 l 2 -7 l -6 -4 l 7 -1 z" fill="#C77DFF" opacity="0.85"/>
+        <path d="M 470 50 l 2 6 l 6 1 l -5 3 l 1 6 l -4 -3 l -4 3 l 1 -6 l -5 -3 l 6 -1 z" fill="#FF6B9D" opacity="0.85"/>
+        <path d="M 350 480 l 3 7 l 7 1 l -6 4 l 2 7 l -6 -4 l -6 4 l 2 -7 l -6 -4 l 7 -1 z" fill="#80E5C5" opacity="0.85"/>
+        <path d="M 510 510 l 2 6 l 6 1 l -5 3 l 1 6 l -4 -3 l -4 3 l 1 -6 l -5 -3 l 6 -1 z" fill="#FFD93D" opacity="0.85"/>
+
+        <!-- titolo -->
+        <text x="285" y="220" font-family="Pacifico, cursive" font-size="40" fill="#C77DFF" opacity="0.95">Sei invitato!</text>
+
+        <!-- zona testo -->
+        <rect data-text-zone="festeggiato|quando|dove"
+              x="260" y="240" width="460" height="190" rx="20"
+              fill="#FFFFFF" opacity="0.62"/>
       </svg>`
     }
   ]
