@@ -112,7 +112,13 @@ function renderStep1() {
     }
   }
 
-  btnNext.addEventListener('click', () => goToStep(2));
+  btnNext.addEventListener('click', () => {
+    if (window.APP_STATE.tipo === 'colora') {
+      goToStep('colora');
+    } else {
+      goToStep(2);
+    }
+  });
 }
 
 /* ---------- STEP 2 ---------- */
