@@ -1483,6 +1483,12 @@ window.editor = {
     brushCanvas.id = 'brush-canvas';
     cardCanvas.appendChild(brushCanvas);
 
+    // in modalità "colora", il brush canvas usa mix-blend-mode: multiply così
+    // le linee nere del disegno sottostante restano sempre in primo piano
+    // (i pixel scuri "passano attraverso" come moltiplicatori)
+    const tpl = window.APP_STATE && window.APP_STATE.template;
+    brushCanvas.style.mixBlendMode = (tpl && tpl.isColoringPage) ? 'multiply' : '';
+
     // adatta subito le dimensioni se il canvas è già stato layoutato
     const setSize = () => {
       const r = cardCanvas.getBoundingClientRect();
