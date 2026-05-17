@@ -534,9 +534,81 @@ function openColoraEditor(prepared) {
   }
 }
 
-// stub: implementato nel Task 9
-function handleColoraUpload(e) {
-  console.log('[colora] TODO: upload', e.target.files);
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024; // 5 MB
+const ALLOWED_UPLOAD_EXTS = ['svg', 'png', 'jpg', 'jpeg', 'jfif'];
+
+async function handleColoraUpload(e) {
+  const input = e.target;
+  const file = input.files && input.files[0];
+  // resetto sempre il valore dell'input così l'utente può ricaricare lo stesso file
+  input.value = '';
+  if (!file) return;
+
+  if (file.size > MAX_UPLOAD_BYTES) {
+    alert('File troppo grande. Massimo 5 MB.');
+    return;
+  }
+  const ext = (file.name.split('.').pop() || '').toLowerCase();
+  if (!ALLOWED_UPLOAD_EXTS.includes(ext)) {
+    alert('Formato non supportato. Usa SVG, PNG, JPG o JFIF.');
+    return;
+  }
+
+  let prepared;
+  if (ext === 'svg') {
+    let svgText;
+    try {
+      svgText = await file.text();
+    } catch (err) {
+      alert('Impossibile leggere il file: ' + err.message);
+      return;
+    }
+    prepared = prepareColoringSvg(svgText);
+    if (!prepared) {
+      alert('SVG non valido — assicurati che abbia un viewBox e nessun errore di sintassi.');
+      return;
+    }
+  } else {
+    // raster: leggo come dataURL e creo un SVG wrapper con viewBox = dimensione immagine
+    try {
+      prepared = await rasterFileToColoringSvg(file);
+    } catch (err) {
+      alert('Impossibile caricare l\'immagine: ' + err.message);
+      return;
+    }
+  }
+  openColoraEditor(prepared);
+}
+
+/**
+ * Trasforma un file raster in un "coloring template": legge dimensioni
+ * naturali, costruisce un SVG wrapper con viewBox W×H e un <image> con
+ * dataURL come unico contenuto. Nessuna zona .colorable (solo pennello).
+ */
+function rasterFileToColoringSvg(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('errore di lettura del file'));
+    reader.onload = () => {
+      const dataUrl = reader.result;
+      const img = new Image();
+      img.onerror = () => reject(new Error('immagine non valida'));
+      img.onload = () => {
+        const w = img.naturalWidth, h = img.naturalHeight;
+        if (!w || !h) { reject(new Error('dimensioni immagine non valide')); return; }
+        const orientation = w > h ? 'landscape' : 'portrait';
+        const svg =
+          `<svg class="template-svg" xmlns="http://www.w3.org/2000/svg" ` +
+          `viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">` +
+          `<image href="${dataUrl}" x="0" y="0" width="${w}" height="${h}" ` +
+          `preserveAspectRatio="xMidYMid meet" />` +
+          `</svg>`;
+        resolve({ svg, orientation, hasColorable: false });
+      };
+      img.src = dataUrl;
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
 /* ---------- Navigazione ---------- */
