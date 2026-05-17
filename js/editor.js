@@ -2113,22 +2113,27 @@ window.editor = {
     saveDraftWrap.appendChild(saveDraftBtn);
     toolbar.appendChild(saveDraftWrap);
 
-    // SALVA COME TEMPLATE
-    const saveTplWrap = document.createElement('div');
-    saveTplWrap.className = 'action-btn-wrap';
-    const saveTplBtn = document.createElement('button');
-    saveTplBtn.type = 'button';
-    saveTplBtn.className = 'action-btn action-btn-save-tpl';
-    saveTplBtn.title = 'Salva come template';
-    saveTplBtn.innerHTML =
-      '<span class="tool-btn-icon" aria-hidden="true">⭐</span>' +
-      '<span class="tool-btn-label">Salva template</span>';
-    saveTplBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this._showSaveTemplateModal();
-    });
-    saveTplWrap.appendChild(saveTplBtn);
-    toolbar.appendChild(saveTplWrap);
+    // SALVA COME TEMPLATE — nascosto in modalità Colora: i template utente
+    // sono mostrati nello Step 2 del wizard, che è saltato per il tipo 'colora',
+    // quindi un template di tipo colora non sarebbe mai selezionabile.
+    const state = window.APP_STATE;
+    if (!state || state.tipo !== 'colora') {
+      const saveTplWrap = document.createElement('div');
+      saveTplWrap.className = 'action-btn-wrap';
+      const saveTplBtn = document.createElement('button');
+      saveTplBtn.type = 'button';
+      saveTplBtn.className = 'action-btn action-btn-save-tpl';
+      saveTplBtn.title = 'Salva come template';
+      saveTplBtn.innerHTML =
+        '<span class="tool-btn-icon" aria-hidden="true">⭐</span>' +
+        '<span class="tool-btn-label">Salva template</span>';
+      saveTplBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this._showSaveTemplateModal();
+      });
+      saveTplWrap.appendChild(saveTplBtn);
+      toolbar.appendChild(saveTplWrap);
+    }
 
     this._updateUndoBadge();
   },
