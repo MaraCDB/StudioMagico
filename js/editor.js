@@ -1903,7 +1903,8 @@ window.editor = {
       biglietto:   'A5 landscape',
       striscione:  'A4 landscape',
       certificato: 'A4 portrait',
-      segnalibro:  'A5 portrait'
+      segnalibro:  'A5 portrait',
+      invito:      'A6 landscape'
     };
     let size = SIZES[tipo] || 'A4 portrait';
     if (tipo === 'libero') {

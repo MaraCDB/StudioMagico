@@ -3,7 +3,7 @@
    ======================================================= */
 
 window.APP_STATE = {
-  tipo: null,        // 'biglietto' | 'striscione' | 'certificato' | 'segnalibro' | 'colora'
+  tipo: null,        // 'biglietto' | 'striscione' | 'certificato' | 'segnalibro' | 'invito' | 'colora'
   template: null,    // oggetto template scelto
   testi: {},         // { campo: 'valore', ... }
   font: 'Baloo 2'
@@ -14,6 +14,7 @@ const TIPI = [
   { id: 'striscione',  nome: 'Striscione',  emoji: '🎉' },
   { id: 'certificato', nome: 'Certificato', emoji: '🏆' },
   { id: 'segnalibro',  nome: 'Segnalibro',  emoji: '🔖' },
+  { id: 'invito',      nome: 'Invito',      emoji: '✉️' },
   { id: 'colora',      nome: 'Colora',      emoji: '🎨' }
 ];
 
@@ -35,6 +36,11 @@ const CAMPI_PER_TIPO = {
   segnalibro: [
     { id: 'nome',  label: 'Nome',            type: 'text',     placeholder: 'Anna' },
     { id: 'frase', label: 'Frase preferita', type: 'textarea', placeholder: 'I libri sono porte magiche.' }
+  ],
+  invito: [
+    { id: 'festeggiato', label: 'Festeggiato',     type: 'text', placeholder: 'Es: Marco compie 8 anni!' },
+    { id: 'quando',      label: 'Quando',          type: 'text', placeholder: 'Es: Sabato 14 giugno, ore 16:00' },
+    { id: 'dove',        label: 'Dove',            type: 'text', placeholder: 'Es: A casa nostra, via Roma 12' }
   ]
 };
 

@@ -1440,6 +1440,107 @@ window.TEMPLATES = {
         <rect data-text-zone="frase" x="30" y="600" width="207" height="120" rx="14" fill="#FFFFFF" opacity="0.45"/>
       </svg>`
     }
+  ],
+
+  /* =====================================================
+     INVITO  (800 x 566 — A6 landscape, 1/4 di A4)
+     Tre campi: festeggiato | quando | dove
+     ===================================================== */
+  invito: [
+
+    /* --- 1. Palloncini e torta --- */
+    {
+      nome: 'Palloncini e torta',
+      emoji: '🎈',
+      background: 'linear-gradient(135deg, #FFE5EC 0%, #FFD6A5 60%, #FFF4CC 100%)',
+      coloreAccento: '#FF6B9D',
+      svg: `<svg viewBox="0 0 800 566" xmlns="http://www.w3.org/2000/svg" class="template-svg" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="invitoBg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stop-color="#FFE5EC"/>
+            <stop offset="60%"  stop-color="#FFD6A5"/>
+            <stop offset="100%" stop-color="#FFF4CC"/>
+          </linearGradient>
+          <linearGradient id="invitoCakeBase" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#FFB088"/>
+            <stop offset="100%" stop-color="#D08060"/>
+          </linearGradient>
+        </defs>
+
+        <rect width="800" height="566" fill="url(#invitoBg)"/>
+        <rect x="14" y="14" width="772" height="538" rx="22" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-dasharray="2 9" opacity="0.9"/>
+
+        <!-- coriandoli sparsi -->
+        <rect x="45"  y="55"  width="9"  height="14" rx="2" fill="#C77DFF" transform="rotate(20 49 62)"/>
+        <rect x="75"  y="200" width="9"  height="13" rx="2" fill="#FFD93D" transform="rotate(-25 79 207)"/>
+        <rect x="40"  y="340" width="9"  height="13" rx="2" fill="#FF6B9D" transform="rotate(35 44 347)"/>
+        <rect x="430" y="40"  width="9"  height="13" rx="2" fill="#FFD93D" transform="rotate(15 434 47)"/>
+        <rect x="535" y="60"  width="9"  height="13" rx="2" fill="#C77DFF" transform="rotate(-20 539 67)"/>
+        <rect x="720" y="265" width="9"  height="13" rx="2" fill="#FF6B9D" transform="rotate(25 724 272)"/>
+        <rect x="755" y="345" width="9"  height="13" rx="2" fill="#FFFFFF" transform="rotate(-30 759 352)"/>
+
+        <!-- stelline -->
+        <path d="M 380 70 l 3 8 l 9 1 l -7 5 l 2 8 l -7 -4 l -7 4 l 2 -8 l -7 -5 l 9 -1 z" fill="#FFFFFF" opacity="0.85"/>
+        <path d="M 460 220 l 3 7 l 8 1 l -6 5 l 2 8 l -7 -4 l -6 4 l 2 -8 l -6 -5 l 8 -1 z" fill="#FFFFFF" opacity="0.75"/>
+
+        <!-- PALLONCINI in alto -->
+        <!-- palloncino 1 (rosa) -->
+        <ellipse cx="120" cy="115" rx="44" ry="54" fill="#FF6B9D"/>
+        <ellipse cx="108" cy="100" rx="10" ry="14" fill="#FFFFFF" opacity="0.55"/>
+        <polygon points="115,168 125,168 120,180" fill="#FF6B9D"/>
+        <path d="M 120 180 Q 115 220 135 250 Q 150 280 130 310" stroke="#7B5CA8" stroke-width="1.5" fill="none"/>
+
+        <!-- palloncino 2 (viola) più alto -->
+        <ellipse cx="205" cy="80" rx="42" ry="52" fill="#C77DFF"/>
+        <ellipse cx="194" cy="65" rx="10" ry="13" fill="#FFFFFF" opacity="0.5"/>
+        <polygon points="200,131 210,131 205,143" fill="#C77DFF"/>
+        <path d="M 205 143 Q 200 190 215 230 Q 225 265 205 295" stroke="#7B5CA8" stroke-width="1.5" fill="none"/>
+
+        <!-- palloncino 3 (giallo) destra -->
+        <ellipse cx="685" cy="110" rx="44" ry="54" fill="#FFD93D"/>
+        <ellipse cx="673" cy="95" rx="10" ry="14" fill="#FFFFFF" opacity="0.55"/>
+        <polygon points="680,163 690,163 685,175" fill="#FFD93D"/>
+        <path d="M 685 175 Q 690 215 670 250 Q 655 285 675 315" stroke="#7B5CA8" stroke-width="1.5" fill="none"/>
+
+        <!-- palloncino 4 (menta) più a destra -->
+        <ellipse cx="755" cy="145" rx="40" ry="50" fill="#80E5C5"/>
+        <ellipse cx="744" cy="130" rx="9"  ry="12" fill="#FFFFFF" opacity="0.5"/>
+        <polygon points="750,194 760,194 755,205" fill="#80E5C5"/>
+        <path d="M 755 205 Q 760 245 745 280 Q 730 315 750 345" stroke="#7B5CA8" stroke-width="1.5" fill="none"/>
+
+        <!-- TORTA in basso a destra -->
+        <!-- piatto -->
+        <ellipse cx="660" cy="540" rx="125" ry="10" fill="#A88FCC" opacity="0.6"/>
+        <!-- base torta -->
+        <rect x="555" y="450" width="210" height="90" rx="6" fill="url(#invitoCakeBase)"/>
+        <!-- glassa che cola sulla base -->
+        <path d="M 555 458 Q 580 472 605 458 Q 630 474 660 458 Q 690 476 715 458 Q 745 472 765 458 L 765 470 L 555 470 Z" fill="#FFE5EC"/>
+        <!-- piano medio -->
+        <rect x="585" y="395" width="150" height="60" rx="6" fill="#FFB5D8"/>
+        <path d="M 585 402 Q 605 414 625 402 Q 645 416 665 402 Q 685 414 705 402 Q 720 414 735 402 L 735 412 L 585 412 Z" fill="#FFFFFF" opacity="0.7"/>
+        <!-- piano top -->
+        <rect x="610" y="350" width="100" height="50" rx="6" fill="#FFD6E7"/>
+        <!-- candeline -->
+        <rect x="635" y="320" width="6" height="32" rx="1" fill="#FF6B9D"/>
+        <rect x="657" y="320" width="6" height="32" rx="1" fill="#FFD93D"/>
+        <rect x="679" y="320" width="6" height="32" rx="1" fill="#80E5C5"/>
+        <!-- fiammelle -->
+        <path d="M 638 320 Q 632 312 638 304 Q 644 312 638 320 Z" fill="#FFA940"/>
+        <path d="M 638 320 Q 636 314 638 308 Q 640 314 638 320 Z" fill="#FFE070"/>
+        <path d="M 660 320 Q 654 312 660 304 Q 666 312 660 320 Z" fill="#FFA940"/>
+        <path d="M 660 320 Q 658 314 660 308 Q 662 314 660 320 Z" fill="#FFE070"/>
+        <path d="M 682 320 Q 676 312 682 304 Q 688 312 682 320 Z" fill="#FFA940"/>
+        <path d="M 682 320 Q 680 314 682 308 Q 684 314 682 320 Z" fill="#FFE070"/>
+
+        <!-- titolo decorativo "Sei invitato!" sopra la zona testo -->
+        <text x="265" y="220" font-family="Pacifico, cursive" font-size="42" fill="#FF6B9D" opacity="0.95">Sei invitato!</text>
+
+        <!-- ZONA TESTO centrale: festeggiato | quando | dove -->
+        <rect data-text-zone="festeggiato|quando|dove"
+              x="260" y="240" width="460" height="190" rx="20"
+              fill="#FFFFFF" opacity="0.55"/>
+      </svg>`
+    }
   ]
 };
 
