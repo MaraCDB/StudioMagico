@@ -349,6 +349,130 @@ function renderStep3() {
   });
 }
 
+/* ---------- STEP COLORA ---------- */
+async function renderStepColora() {
+  const root = document.getElementById('step-colora');
+  if (!root) return;
+
+  // markup iniziale (placeholder finché non carico il manifest)
+  root.innerHTML = `
+    <h2 class="step-title">🎨 Scegli un disegno da colorare</h2>
+    <p class="step-subtitle">Scegli dalla galleria o carica un disegno dal tuo computer</p>
+
+    <div id="colora-gallery" class="colora-gallery" aria-live="polite">
+      <p class="colora-loading">Caricamento disegni…</p>
+    </div>
+
+    <div class="colora-upload-row">
+      <input type="file" id="colora-file-input"
+             accept=".svg,.png,.jpg,.jpeg,.jfif,image/svg+xml,image/png,image/jpeg" hidden />
+      <button type="button" class="btn btn-secondary" id="btn-colora-upload">
+        📁 Carica dal computer
+      </button>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" id="btn-prev-colora">← Indietro</button>
+    </div>
+  `;
+
+  // back: torna allo Step 1
+  root.querySelector('#btn-prev-colora').addEventListener('click', () => goToStep(1));
+
+  // upload (handler completo nel Task 9)
+  const fileInput = root.querySelector('#colora-file-input');
+  const btnUpload = root.querySelector('#btn-colora-upload');
+  btnUpload.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', (e) => handleColoraUpload(e));
+
+  // fetch manifest
+  let manifest = { drawings: [] };
+  try {
+    const res = await fetch('colouring_pages/index.json', { cache: 'no-store' });
+    if (res.ok) {
+      manifest = await res.json();
+    }
+  } catch (err) {
+    console.warn('[colora] impossibile caricare il manifest:', err);
+  }
+
+  renderColoraGallery(manifest.drawings || []);
+}
+
+function renderColoraGallery(drawings) {
+  const gallery = document.getElementById('colora-gallery');
+  if (!gallery) return;
+
+  if (!Array.isArray(drawings) || drawings.length === 0) {
+    gallery.innerHTML = `
+      <p class="colora-empty">
+        Nessun disegno disponibile ancora.<br />
+        Carica un disegno dal tuo computer 👇
+      </p>
+    `;
+    return;
+  }
+
+  // categorie uniche per filtri
+  const categories = [...new Set(drawings.map(d => d.category).filter(Boolean))];
+  const filtersHtml = categories.length > 0 ? `
+    <div class="colora-filters" role="tablist">
+      <button type="button" class="colora-filter active" data-cat="">Tutti</button>
+      ${categories.map(c => `
+        <button type="button" class="colora-filter" data-cat="${escapeHtml(c)}">
+          ${escapeHtml(c)}
+        </button>
+      `).join('')}
+    </div>
+  ` : '';
+
+  const cardsHtml = drawings.map((d, i) => `
+    <div class="colora-card"
+         data-file="${escapeHtml(d.file)}"
+         data-category="${escapeHtml(d.category || '')}"
+         role="button" tabindex="0">
+      <span class="colora-card-emoji">${escapeHtml(d.emoji || '🎨')}</span>
+      <span class="colora-card-name">${escapeHtml(d.name || d.file)}</span>
+    </div>
+  `).join('');
+
+  gallery.innerHTML = `
+    ${filtersHtml}
+    <div class="colora-grid">${cardsHtml}</div>
+  `;
+
+  // filtri
+  gallery.querySelectorAll('.colora-filter').forEach(btn => {
+    btn.addEventListener('click', () => {
+      gallery.querySelectorAll('.colora-filter').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const cat = btn.dataset.cat || '';
+      gallery.querySelectorAll('.colora-card').forEach(card => {
+        card.hidden = cat && card.dataset.category !== cat;
+      });
+    });
+  });
+
+  // click su una card: carica il disegno (handler completo nel Task 7)
+  gallery.querySelectorAll('.colora-card').forEach(card => {
+    const open = () => loadColoraDrawing(card.dataset.file);
+    card.addEventListener('click', open);
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+    });
+  });
+}
+
+// stub: implementato nel Task 7
+function loadColoraDrawing(file) {
+  console.log('[colora] TODO: load drawing', file);
+}
+
+// stub: implementato nel Task 9
+function handleColoraUpload(e) {
+  console.log('[colora] TODO: upload', e.target.files);
+}
+
 /* ---------- Navigazione ---------- */
 function goToStep(n) {
   document.querySelectorAll('.wizard-step').forEach(s => {
