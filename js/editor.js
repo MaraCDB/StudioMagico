@@ -276,7 +276,7 @@ window.editor = {
     if (editorEl) editorEl.hidden = false;
 
     // 2. dimensione canvas: classe ratio-* per i 4 tipi standard,
-    //    stili inline per 'libero' (misura custom in cm)
+    //    'colora' (A4) con orientamento variabile, 'libero' con misura custom
     const canvas = document.getElementById('card-canvas');
     if (!canvas) return;
     canvas.className = '';
@@ -286,6 +286,12 @@ window.editor = {
       canvas.style.width = `min(90vw, ${ratio * 600}px)`;
       canvas.style.aspectRatio = `${fs.w} / ${fs.h}`;
       canvas.style.maxWidth = 'none';
+    } else if (state.tipo === 'colora') {
+      canvas.style.width = '';
+      canvas.style.aspectRatio = '';
+      canvas.style.maxWidth = '';
+      const orientation = (state.template && state.template.orientation) || 'portrait';
+      canvas.classList.add('ratio-colora-' + orientation);
     } else {
       canvas.style.width = '';
       canvas.style.aspectRatio = '';
