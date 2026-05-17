@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Studio Magico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Pacifico&family=Fredoka+One&family=Patrick+Hand&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="logo">
+      <span class="logo-icon" aria-hidden="true">✨</span>
+      <span class="logo-text">Studio Magico</span>
+      <span class="logo-icon logo-icon-right" aria-hidden="true">🎨</span>
+    </div>
+    <nav class="step-bar" aria-label="Avanzamento">
+      <div class="step active" data-step="1">
+        <span class="step-num">1</span>
+        <span class="step-label">Tipo</span>
+      </div>
+      <span class="step-line" aria-hidden="true"></span>
+      <div class="step" data-step="2">
+        <span class="step-num">2</span>
+        <span class="step-label">Tema</span>
+      </div>
+      <span class="step-line" aria-hidden="true"></span>
+      <div class="step" data-step="3">
+        <span class="step-num">3</span>
+        <span class="step-label">Testi</span>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <div id="screen-menu">
+      <div class="menu-container">
+        <h1 class="menu-title">Cosa vuoi creare oggi?</h1>
+        <p class="menu-subtitle">Scegli il tuo percorso magico ✨</p>
+        <div class="menu-paths">
+          <button class="path-card" id="path-wizard" type="button">
+            <span class="path-emoji" aria-hidden="true">🧙‍♂️</span>
+            <span class="path-name">Crea con il wizard</span>
+            <span class="path-desc">Ti guidiamo passo passo: tipo, tema e testi.</span>
+          </button>
+          <button class="path-card path-card-alt" id="path-free" type="button">
+            <span class="path-emoji" aria-hidden="true">✏️</span>
+            <span class="path-name">Crea libero</span>
+            <span class="path-desc">Inizia da zero, decora come vuoi tu.</span>
+          </button>
+        </div>
+
+        <div class="menu-extras">
+          <button class="menu-extra-btn" id="path-drafts" type="button" hidden>
+            <span class="menu-extra-icon" aria-hidden="true">📂</span>
+            <span class="menu-extra-text">Riprendi bozza</span>
+            <span class="menu-extra-count" id="drafts-count"></span>
+          </button>
+          <button class="menu-extra-btn" id="path-my-tpls" type="button" hidden>
+            <span class="menu-extra-icon" aria-hidden="true">⭐</span>
+            <span class="menu-extra-text">I miei template</span>
+            <span class="menu-extra-count" id="my-tpls-count"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="screen-my-templates" hidden>
+      <div class="my-tpls-container">
+        <div class="my-tpls-header">
+          <button class="btn btn-secondary" id="btn-my-tpls-back" type="button">← Torna al menu</button>
+          <h2 class="my-tpls-title">⭐ I miei template</h2>
+          <span class="my-tpls-header-spacer" aria-hidden="true"></span>
+        </div>
+        <p class="my-tpls-empty" id="my-tpls-empty" hidden>
+          Non hai ancora salvato nessun template.<br />
+          Crea un biglietto e usa il bottone <b>⭐ Salva template</b> nella toolbar dell'editor.
+        </p>
+        <div class="my-tpls-grid" id="my-tpls-grid"></div>
+      </div>
+    </div>
+
+    <div id="screen-drafts" hidden>
+      <div class="my-tpls-container">
+        <div class="my-tpls-header">
+          <button class="btn btn-secondary" id="btn-drafts-back" type="button">← Torna al menu</button>
+          <h2 class="my-tpls-title">📂 Le mie bozze</h2>
+          <span class="my-tpls-header-spacer" aria-hidden="true"></span>
+        </div>
+        <p class="my-tpls-empty" id="drafts-empty" hidden>
+          Non hai ancora nessuna bozza salvata.<br />
+          Quando sei nell'editor, usa il bottone <b>💾 Salva bozza</b> per riprendere il lavoro più tardi.
+        </p>
+        <div class="my-tpls-grid" id="drafts-grid"></div>
+      </div>
+    </div>
+
+    <div id="screen-free" hidden>
+      <div class="free-container">
+        <h2 class="step-title">✏️ Crea libero</h2>
+        <p class="step-subtitle">Scegli formato e sfondo, poi via libera alla fantasia 🎨</p>
+
+        <h3 class="free-section-title">Formato</h3>
+        <div class="free-format-grid">
+          <div class="type-card" data-free-tipo="biglietto"   role="button" tabindex="0">
+            <span class="type-emoji" aria-hidden="true">📨</span>
+            <span class="type-name">Biglietto</span>
+          </div>
+          <div class="type-card" data-free-tipo="striscione"  role="button" tabindex="0">
+            <span class="type-emoji" aria-hidden="true">🎉</span>
+            <span class="type-name">Striscione</span>
+          </div>
+          <div class="type-card" data-free-tipo="certificato" role="button" tabindex="0">
+            <span class="type-emoji" aria-hidden="true">🏆</span>
+            <span class="type-name">Certificato</span>
+          </div>
+          <div class="type-card" data-free-tipo="segnalibro"  role="button" tabindex="0">
+            <span class="type-emoji" aria-hidden="true">🔖</span>
+            <span class="type-name">Segnalibro</span>
+          </div>
+          <div class="type-card" data-free-tipo="libero"      role="button" tabindex="0">
+            <span class="type-emoji" aria-hidden="true">📐</span>
+            <span class="type-name">Misura libera</span>
+          </div>
+        </div>
+
+        <div id="free-size-section" hidden>
+          <div class="free-size-inputs">
+            <label>
+              <span>Larghezza (cm)</span>
+              <input type="number" id="free-width"  min="1" max="100" step="1" value="15" />
+            </label>
+            <span class="free-x" aria-hidden="true">×</span>
+            <label>
+              <span>Altezza (cm)</span>
+              <input type="number" id="free-height" min="1" max="100" step="1" value="10" />
+            </label>
+            <div class="free-size-preview" id="free-size-preview" aria-hidden="true">
+              <span class="free-size-preview-label">15 × 10 cm</span>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="free-section-title">Sfondo</h3>
+        <div class="bg-mode-tabs">
+          <button type="button" class="bg-mode-tab active" data-bg-mode="solid">🎨 <span>Tinta unita</span></button>
+          <button type="button" class="bg-mode-tab"        data-bg-mode="gradient">🌈 <span>Gradiente</span></button>
+        </div>
+
+        <div class="bg-mode-content" data-bg-mode="solid">
+          <div class="bg-palette">
+            <button type="button" class="bg-swatch selected" data-bg="#FFFFFF" style="background:#FFFFFF" title="Bianco"></button>
+            <button type="button" class="bg-swatch"          data-bg="#FFF8F0" style="background:#FFF8F0" title="Crema"></button>
+            <button type="button" class="bg-swatch"          data-bg="#FFD6E7" style="background:#FFD6E7" title="Rosa pastello"></button>
+            <button type="button" class="bg-swatch"          data-bg="#FFF4CC" style="background:#FFF4CC" title="Giallo pastello"></button>
+            <button type="button" class="bg-swatch"          data-bg="#CCFFF0" style="background:#CCFFF0" title="Menta pastello"></button>
+            <button type="button" class="bg-swatch"          data-bg="#CCE8FF" style="background:#CCE8FF" title="Azzurro pastello"></button>
+            <button type="button" class="bg-swatch"          data-bg="#EDD6FF" style="background:#EDD6FF" title="Viola pastello"></button>
+            <input type="color" id="bg-custom" class="bg-color-picker" value="#FFFFFF" title="Colore personalizzato" />
+          </div>
+        </div>
+
+        <div class="bg-mode-content" data-bg-mode="gradient" hidden>
+          <div class="bg-gradient-row">
+            <label class="bg-gradient-color">
+              <span>Colore 1</span>
+              <input type="color" id="bg-grad-1" value="#FFB5D8" />
+            </label>
+            <label class="bg-gradient-color">
+              <span>Colore 2</span>
+              <input type="color" id="bg-grad-2" value="#C77DFF" />
+            </label>
+          </div>
+          <div class="bg-gradient-dir-row">
+            <span class="bg-gradient-dir-label">Direzione</span>
+            <div class="bg-gradient-dir-grid">
+              <button type="button" class="bg-dir-btn"        data-dir="180deg" title="Verticale">↓</button>
+              <button type="button" class="bg-dir-btn active"  data-dir="135deg" title="Diagonale ↘">↘</button>
+              <button type="button" class="bg-dir-btn"        data-dir="90deg"  title="Orizzontale">→</button>
+              <button type="button" class="bg-dir-btn"        data-dir="45deg"  title="Diagonale ↗">↗</button>
+            </div>
+          </div>
+          <div class="bg-gradient-preview" id="bg-grad-preview" aria-hidden="true"></div>
+        </div>
+
+        <div class="nav-buttons">
+          <button class="btn btn-secondary" id="btn-free-back"  type="button">← Indietro</button>
+          <button class="btn btn-primary"   id="btn-free-start" type="button" disabled>Inizia! →</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="wizard" hidden>
+      <section id="step1" class="wizard-step active"></section>
+      <section id="step2" class="wizard-step" hidden></section>
+      <section id="step3" class="wizard-step" hidden></section>
+    </div>
+
+    <div id="editor" hidden>
+      <button id="btn-restart" type="button">← Ricomincia</button>
+      <div id="toolbar" aria-label="Strumenti"></div>
+      <div id="canvas-wrapper">
+        <div id="card-canvas"></div>
+      </div>
+    </div>
+
+    <div id="modal-save-template-overlay" class="modal-overlay" hidden></div>
+    <div id="modal-save-template" class="modal" role="dialog" aria-modal="true"
+         aria-labelledby="modal-save-template-title" hidden>
+      <h2 id="modal-save-template-title" class="modal-title">⭐ Salva come template</h2>
+
+      <div class="modal-section">
+        <label class="modal-label" for="tpl-name">Nome del template</label>
+        <input type="text" id="tpl-name" class="modal-input"
+               placeholder="Es: Compleanno di Luca" maxlength="60" />
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-label">Tipo</div>
+        <div class="modal-radio-grid">
+          <label class="modal-radio">
+            <input type="radio" name="tpl-tipo" value="biglietto" />
+            <span class="modal-radio-box">
+              <span class="modal-radio-emoji" aria-hidden="true">📨</span>
+              <span class="modal-radio-text">Biglietto</span>
+            </span>
+          </label>
+          <label class="modal-radio">
+            <input type="radio" name="tpl-tipo" value="striscione" />
+            <span class="modal-radio-box">
+              <span class="modal-radio-emoji" aria-hidden="true">🎉</span>
+              <span class="modal-radio-text">Striscione</span>
+            </span>
+          </label>
+          <label class="modal-radio">
+            <input type="radio" name="tpl-tipo" value="certificato" />
+            <span class="modal-radio-box">
+              <span class="modal-radio-emoji" aria-hidden="true">🏆</span>
+              <span class="modal-radio-text">Certificato</span>
+            </span>
+          </label>
+          <label class="modal-radio">
+            <input type="radio" name="tpl-tipo" value="segnalibro" />
+            <span class="modal-radio-box">
+              <span class="modal-radio-emoji" aria-hidden="true">🔖</span>
+              <span class="modal-radio-text">Segnalibro</span>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-label">Categoria</div>
+        <div class="modal-radio-grid modal-radio-grid-cat">
+          <label class="modal-radio">
+            <input type="radio" name="tpl-categoria" value="Compleanno" />
+            <span class="modal-radio-box">
+              <span class="modal-radio-emoji" aria-hidden="true">🎂</span>
+              <span class="modal-radio-text">Compleanno</span>
+            </span>
+          </label>
+          <label class="modal-radio">
+            <input type="radio" name="tpl-categoria" value="Natale" />
+            <span class="modal-radio-box">
+              <span class="modal-radio-emoji" aria-hidden="true">🎄</span>
+              <span class="modal-radio-text">Natale</span>
+            </span>
+          </label>
+          <label class="modal-radio">
+            <input type="radio" name="tpl-categoria" value="Animali" />
+            <span class="modal-radio-box">
+              <span class="modal-radio-emoji" aria-hidden="true">🐾</span>
+              <span class="modal-radio-text">Animali</span>
+            </span>
+          </label>
+          <label class="modal-radio">
+            <input type="radio" name="tpl-categoria" value="Spazio" />
+            <span class="modal-radio-box">
+              <span class="modal-radio-emoji" aria-hidden="true">🚀</span>
+              <span class="modal-radio-text">Spazio</span>
+            </span>
+          </label>
+          <label class="modal-radio">
+            <input type="radio" name="tpl-categoria" value="Unicorno" />
+            <span class="modal-radio-box">
+              <span class="modal-radio-emoji" aria-hidden="true">🦄</span>
+              <span class="modal-radio-text">Unicorno</span>
+            </span>
+          </label>
+          <label class="modal-radio">
+            <input type="radio" name="tpl-categoria" value="Altro" />
+            <span class="modal-radio-box">
+              <span class="modal-radio-emoji" aria-hidden="true">✨</span>
+              <span class="modal-radio-text">Altro</span>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-label">Anteprima</div>
+        <div class="modal-preview" id="tpl-preview"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" id="tpl-cancel">Annulla</button>
+        <button type="button" class="btn btn-primary"   id="tpl-save">Salva ⭐</button>
+      </div>
+    </div>
+
+    <div id="modal-save-draft-overlay" class="modal-overlay" hidden></div>
+    <div id="modal-save-draft" class="modal modal-small" role="dialog" aria-modal="true"
+         aria-labelledby="modal-save-draft-title" hidden>
+      <h2 id="modal-save-draft-title" class="modal-title">💾 Salva bozza</h2>
+      <p class="modal-hint">
+        Salva il lavoro in corso per riprenderlo dal menu "Riprendi bozza".
+      </p>
+      <div class="modal-section">
+        <label class="modal-label" for="draft-name">Nome della bozza</label>
+        <input type="text" id="draft-name" class="modal-input"
+               placeholder="Es: Lavoro di Marco" maxlength="80" />
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" id="draft-cancel">Annulla</button>
+        <button type="button" class="btn btn-primary"   id="draft-save">Salva 💾</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
+          integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="js/templates.js"></script>
+  <script src="js/wizard.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/tools.js"></script>
+</body>
+</html>
