@@ -469,9 +469,69 @@ function renderColoraGallery(drawings) {
   });
 }
 
-// stub: implementato nel Task 7
-function loadColoraDrawing(file) {
-  console.log('[colora] TODO: load drawing', file);
+/**
+ * Parsa una stringa SVG, estrae viewBox e orientamento,
+ * marca l'elemento root con class="template-svg" pronto per l'editor.
+ * @returns { svg: string, orientation: 'portrait'|'landscape', hasColorable: boolean } | null
+ */
+function prepareColoringSvg(svgString) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(svgString, 'image/svg+xml');
+  const parserError = doc.querySelector('parsererror');
+  if (parserError) return null;
+  const svg = doc.documentElement;
+  if (!svg || svg.tagName.toLowerCase() !== 'svg') return null;
+
+  const vb = svg.getAttribute('viewBox');
+  if (!vb) return null;
+  const parts = vb.trim().split(/\s+/).map(Number);
+  if (parts.length !== 4 || parts.some(n => !Number.isFinite(n))) return null;
+  const [, , w, h] = parts;
+  if (w <= 0 || h <= 0) return null;
+
+  svg.classList.add('template-svg');
+
+  const hasColorable = svg.querySelector('.colorable') !== null;
+  const orientation = w > h ? 'landscape' : 'portrait';
+  return {
+    svg: new XMLSerializer().serializeToString(svg),
+    orientation,
+    hasColorable
+  };
+}
+
+async function loadColoraDrawing(file) {
+  if (!file) return;
+  let svgText;
+  try {
+    const res = await fetch('colouring_pages/' + file, { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    svgText = await res.text();
+  } catch (err) {
+    alert('Impossibile caricare il disegno: ' + err.message);
+    return;
+  }
+  const prepared = prepareColoringSvg(svgText);
+  if (!prepared) {
+    alert('Disegno non valido — assicurati che l\'SVG abbia un viewBox valido.');
+    return;
+  }
+  openColoraEditor(prepared);
+}
+
+function openColoraEditor(prepared) {
+  window.APP_STATE.template = {
+    nome: 'Colora',
+    background: '#FFFFFF',
+    svg: prepared.svg,
+    isColoringPage: true,
+    orientation: prepared.orientation,
+    hasColorable: prepared.hasColorable
+  };
+  window.APP_STATE.testi = {};
+  if (window.editor && typeof window.editor.init === 'function') {
+    window.editor.init();
+  }
 }
 
 // stub: implementato nel Task 9
