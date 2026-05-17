@@ -1909,6 +1909,10 @@ window.editor = {
     if (tipo === 'libero') {
       const fs = (window.APP_STATE && window.APP_STATE.freeSize) || { w: 15, h: 10 };
       size = `${fs.w}cm ${fs.h}cm`;
+    } else if (tipo === 'colora') {
+      const orientation = (window.APP_STATE && window.APP_STATE.template
+                           && window.APP_STATE.template.orientation) || 'portrait';
+      size = orientation === 'landscape' ? 'A4 landscape' : 'A4 portrait';
     }
     let styleEl = document.getElementById('print-page-style');
     if (!styleEl) {
