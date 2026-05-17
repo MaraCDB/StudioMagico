@@ -975,10 +975,12 @@ body.mode-editor-free .step-bar {
 }
 
 /* Aspect-ratio dinamico per tipo */
-.ratio-biglietto   { aspect-ratio: 3 / 2;  max-width: 700px; }
-.ratio-striscione  { aspect-ratio: 4 / 1;  max-width: 900px; }
-.ratio-certificato { aspect-ratio: 3 / 4;  max-width: 500px; }
-.ratio-segnalibro  { aspect-ratio: 1 / 3;  max-width: 220px; }
+.ratio-biglietto        { aspect-ratio: 3 / 2;     max-width: 700px; }
+.ratio-striscione       { aspect-ratio: 4 / 1;     max-width: 900px; }
+.ratio-certificato      { aspect-ratio: 3 / 4;     max-width: 500px; }
+.ratio-segnalibro       { aspect-ratio: 1 / 3;     max-width: 220px; }
+.ratio-colora-portrait  { aspect-ratio: 210 / 297; max-width: 560px; }
+.ratio-colora-landscape { aspect-ratio: 297 / 210; max-width: 800px; }
 
 .canvas-text {
   position: absolute;
