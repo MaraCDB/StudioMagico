@@ -896,6 +896,20 @@ window.tools.color = {
     this._bindPanelEvents();
     this._syncPanelSelection();
 
+    // disabilita il secchiello se il template è un coloring page senza zone .colorable
+    // (es. PNG/JPG caricato dall'utente, o SVG senza path .colorable)
+    const tpl = window.APP_STATE && window.APP_STATE.template;
+    if (tpl && tpl.isColoringPage && !tpl.hasColorable) {
+      const bucketBtn = panel.querySelector('.color-tab[data-tab="bucket"]');
+      if (bucketBtn) {
+        bucketBtn.disabled = true;
+        bucketBtn.title = 'Disponibile solo su disegni preparati con zone colorabili';
+        bucketBtn.classList.add('color-tab-disabled');
+      }
+      // forza il tab attivo su brush (default è bucket)
+      this.activeTab = 'brush';
+    }
+
     this._attachBucketHandler();
     this._attachBrushHandlers();
 

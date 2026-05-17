@@ -1852,6 +1852,18 @@ body.mode-editor-free .step-bar {
   box-shadow: var(--sh-sm);
 }
 
+.color-tab.color-tab-disabled,
+.color-tab:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.6);
+}
+.color-tab.color-tab-disabled:hover,
+.color-tab:disabled:hover {
+  background: var(--crema);
+  border-color: transparent;
+}
+
 .color-tab-content[hidden] { display: none; }
 
 /* palette colori grande (20 + picker) */
