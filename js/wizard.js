@@ -3,7 +3,7 @@
    ======================================================= */
 
 window.APP_STATE = {
-  tipo: null,        // 'biglietto' | 'striscione' | 'certificato' | 'segnalibro'
+  tipo: null,        // 'biglietto' | 'striscione' | 'certificato' | 'segnalibro' | 'colora'
   template: null,    // oggetto template scelto
   testi: {},         // { campo: 'valore', ... }
   font: 'Baloo 2'
@@ -13,7 +13,8 @@ const TIPI = [
   { id: 'biglietto',   nome: 'Biglietto',   emoji: '📨' },
   { id: 'striscione',  nome: 'Striscione',  emoji: '🎉' },
   { id: 'certificato', nome: 'Certificato', emoji: '🏆' },
-  { id: 'segnalibro',  nome: 'Segnalibro',  emoji: '🔖' }
+  { id: 'segnalibro',  nome: 'Segnalibro',  emoji: '🔖' },
+  { id: 'colora',      nome: 'Colora',      emoji: '🎨' }
 ];
 
 const CAMPI_PER_TIPO = {
