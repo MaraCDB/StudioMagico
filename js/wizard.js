@@ -479,22 +479,53 @@ function goToStep(n) {
     s.classList.remove('active');
     s.hidden = true;
   });
-  const target = document.getElementById(`step${n}`);
+
+  // 'colora' è un id-string speciale, non un numero
+  const targetId = (n === 'colora') ? 'step-colora' : `step${n}`;
+  const target = document.getElementById(targetId);
   if (!target) return;
   target.hidden = false;
   target.classList.add('active');
 
-  // step bar
-  document.querySelectorAll('.step-bar .step').forEach((s, i) => {
-    s.classList.remove('active', 'completed');
-    const num = i + 1;
-    if (num < n) s.classList.add('completed');
-    else if (num === n) s.classList.add('active');
-  });
+  // step-bar dinamica
+  updateStepBar(n);
 
-  if (n === 1) renderStep1();
-  else if (n === 2) renderStep2();
-  else if (n === 3) renderStep3();
+  if (n === 1)             renderStep1();
+  else if (n === 2)        renderStep2();
+  else if (n === 3)        renderStep3();
+  else if (n === 'colora') renderStepColora();
+}
+
+function updateStepBar(n) {
+  const bar = document.querySelector('.step-bar');
+  if (!bar) return;
+  const tipo = window.APP_STATE && window.APP_STATE.tipo;
+
+  // configurazione step a seconda del tipo
+  const config = (tipo === 'colora')
+    ? [{ num: 1, label: 'Tipo' }, { num: 2, label: 'Disegno' }]
+    : [{ num: 1, label: 'Tipo' }, { num: 2, label: 'Tema' }, { num: 3, label: 'Testi' }];
+
+  // numero "corrente" come indice 1-based nella sequenza config
+  let currentIdx;
+  if (n === 1)             currentIdx = 1;
+  else if (n === 'colora') currentIdx = 2;
+  else                     currentIdx = n;
+
+  bar.innerHTML = config.map((s, i) => {
+    const isLast = i === config.length - 1;
+    const stepNum = i + 1;
+    const cls = stepNum < currentIdx ? 'step completed'
+              : stepNum === currentIdx ? 'step active'
+              : 'step';
+    return `
+      <div class="${cls}" data-step="${stepNum}">
+        <span class="step-num">${stepNum}</span>
+        <span class="step-label">${s.label}</span>
+      </div>
+      ${isLast ? '' : '<span class="step-line" aria-hidden="true"></span>'}
+    `;
+  }).join('');
 }
 
 function restartWizard() {
