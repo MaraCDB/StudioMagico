@@ -517,20 +517,52 @@ function prepareColoringSvg(svgString) {
 
 async function loadColoraDrawing(file) {
   if (!file) return;
-  let svgText;
+  const ext = (file.split('.').pop() || '').toLowerCase();
+
+  let res;
   try {
-    const res = await fetch('colouring_pages/' + file, { cache: 'no-store' });
+    res = await fetch('colouring_pages/' + file, { cache: 'no-store' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    svgText = await res.text();
   } catch (err) {
     alert('Impossibile caricare il disegno: ' + err.message);
     return;
   }
-  const prepared = prepareColoringSvg(svgText);
-  if (!prepared) {
-    alert('Disegno non valido — assicurati che l\'SVG abbia un viewBox valido.');
+
+  let prepared;
+  if (ext === 'svg') {
+    let svgText;
+    try {
+      svgText = await res.text();
+    } catch (err) {
+      alert('Impossibile leggere il disegno: ' + err.message);
+      return;
+    }
+    prepared = prepareColoringSvg(svgText);
+    if (!prepared) {
+      alert('Disegno non valido — assicurati che l\'SVG abbia un viewBox valido.');
+      return;
+    }
+  } else if (['png', 'jpg', 'jpeg', 'jfif'].includes(ext)) {
+    // raster dalla galleria: fetch come blob, wrap in SVG con <image dataURL>
+    let blob;
+    try {
+      blob = await res.blob();
+    } catch (err) {
+      alert('Impossibile leggere il disegno: ' + err.message);
+      return;
+    }
+    try {
+      // rasterFileToColoringSvg accetta qualunque Blob (File estende Blob)
+      prepared = await rasterFileToColoringSvg(blob);
+    } catch (err) {
+      alert('Impossibile caricare l\'immagine: ' + err.message);
+      return;
+    }
+  } else {
+    alert('Formato non supportato dalla galleria: ' + ext);
     return;
   }
+
   openColoraEditor(prepared);
 }
 
