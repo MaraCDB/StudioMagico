@@ -44,7 +44,18 @@ const CAMPI_PER_TIPO = {
   ]
 };
 
-const FONTS = ['Baloo 2', 'Pacifico', 'Fredoka One', 'Patrick Hand'];
+const FONTS = [
+  'Baloo 2',          // sans serif morbido (default)
+  'Patrick Hand',     // scrittura a mano pulita
+  'Caveat',           // scrittura a mano fluida
+  'Schoolbell',       // scrittura scolastica
+  'Fredoka One',      // display chunky
+  'Bangers',          // fumetto/cartoon
+  'Permanent Marker', // pennarello indelebile
+  'Pacifico',         // script vintage
+  'Princess Sofia',   // script elegante
+  'Sarina'            // decorativo
+];
 
 /* ---------- STEP 1 ---------- */
 function renderStep1() {
