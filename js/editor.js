@@ -2248,16 +2248,18 @@ window.editor = {
 
   /** Mostra il menu principale e nasconde tutto il resto. */
   _showMenu() {
-    const screenMenu  = document.getElementById('screen-menu');
-    const screenFree  = document.getElementById('screen-free');
-    const screenMyTpl = document.getElementById('screen-my-templates');
-    const wizard      = document.getElementById('wizard');
-    const editorEl    = document.getElementById('editor');
-    if (screenFree)  screenFree.hidden  = true;
-    if (screenMyTpl) screenMyTpl.hidden = true;
-    if (wizard)      wizard.hidden      = true;
-    if (editorEl)    editorEl.hidden    = true;
-    if (screenMenu)  screenMenu.hidden  = false;
+    const screenMenu   = document.getElementById('screen-menu');
+    const screenFree   = document.getElementById('screen-free');
+    const screenMyTpl  = document.getElementById('screen-my-templates');
+    const screenDrafts = document.getElementById('screen-drafts');
+    const wizard       = document.getElementById('wizard');
+    const editorEl     = document.getElementById('editor');
+    if (screenFree)   screenFree.hidden   = true;
+    if (screenMyTpl)  screenMyTpl.hidden  = true;
+    if (screenDrafts) screenDrafts.hidden = true;
+    if (wizard)       wizard.hidden       = true;
+    if (editorEl)     editorEl.hidden     = true;
+    if (screenMenu)   screenMenu.hidden   = false;
     this._setBodyMode('menu');
     this._refreshMyTemplatesMenuButton();
     this._refreshDraftsMenuButton();
@@ -2265,27 +2267,35 @@ window.editor = {
 
   /** Mostra il wizard (lo stato è già renderizzato da wizard.js). */
   _showWizard() {
-    const screenMenu = document.getElementById('screen-menu');
-    const screenFree = document.getElementById('screen-free');
-    const wizard     = document.getElementById('wizard');
-    const editorEl   = document.getElementById('editor');
-    if (screenMenu) screenMenu.hidden = true;
-    if (screenFree) screenFree.hidden = true;
-    if (editorEl)   editorEl.hidden   = true;
-    if (wizard)     wizard.hidden     = false;
+    const screenMenu   = document.getElementById('screen-menu');
+    const screenFree   = document.getElementById('screen-free');
+    const screenMyTpl  = document.getElementById('screen-my-templates');
+    const screenDrafts = document.getElementById('screen-drafts');
+    const wizard       = document.getElementById('wizard');
+    const editorEl     = document.getElementById('editor');
+    if (screenMenu)   screenMenu.hidden   = true;
+    if (screenFree)   screenFree.hidden   = true;
+    if (screenMyTpl)  screenMyTpl.hidden  = true;
+    if (screenDrafts) screenDrafts.hidden = true;
+    if (editorEl)     editorEl.hidden     = true;
+    if (wizard)       wizard.hidden       = false;
     this._setBodyMode('wizard');
   },
 
   /** Mostra la schermata "crea libero". */
   _showScreenFree() {
-    const screenMenu = document.getElementById('screen-menu');
-    const screenFree = document.getElementById('screen-free');
-    const wizard     = document.getElementById('wizard');
-    const editorEl   = document.getElementById('editor');
-    if (screenMenu) screenMenu.hidden = true;
-    if (wizard)     wizard.hidden     = true;
-    if (editorEl)   editorEl.hidden   = true;
-    if (screenFree) screenFree.hidden = false;
+    const screenMenu   = document.getElementById('screen-menu');
+    const screenFree   = document.getElementById('screen-free');
+    const screenMyTpl  = document.getElementById('screen-my-templates');
+    const screenDrafts = document.getElementById('screen-drafts');
+    const wizard       = document.getElementById('wizard');
+    const editorEl     = document.getElementById('editor');
+    if (screenMenu)   screenMenu.hidden   = true;
+    if (screenMyTpl)  screenMyTpl.hidden  = true;
+    if (screenDrafts) screenDrafts.hidden = true;
+    if (wizard)       wizard.hidden       = true;
+    if (editorEl)     editorEl.hidden     = true;
+    if (screenFree)   screenFree.hidden   = false;
     this._setBodyMode('free');
   },
 
@@ -2782,16 +2792,18 @@ window.editor = {
 
   /** Mostra la schermata #screen-my-templates con la griglia rigenerata. */
   _showMyTemplates() {
-    const screenMenu  = document.getElementById('screen-menu');
-    const screenFree  = document.getElementById('screen-free');
-    const screenMyTpl = document.getElementById('screen-my-templates');
-    const wizard      = document.getElementById('wizard');
-    const editorEl    = document.getElementById('editor');
-    if (screenMenu)  screenMenu.hidden = true;
-    if (screenFree)  screenFree.hidden = true;
-    if (wizard)      wizard.hidden     = true;
-    if (editorEl)    editorEl.hidden   = true;
-    if (screenMyTpl) screenMyTpl.hidden = false;
+    const screenMenu   = document.getElementById('screen-menu');
+    const screenFree   = document.getElementById('screen-free');
+    const screenMyTpl  = document.getElementById('screen-my-templates');
+    const screenDrafts = document.getElementById('screen-drafts');
+    const wizard       = document.getElementById('wizard');
+    const editorEl     = document.getElementById('editor');
+    if (screenMenu)   screenMenu.hidden   = true;
+    if (screenFree)   screenFree.hidden   = true;
+    if (screenDrafts) screenDrafts.hidden = true;
+    if (wizard)       wizard.hidden       = true;
+    if (editorEl)     editorEl.hidden     = true;
+    if (screenMyTpl)  screenMyTpl.hidden  = false;
     this._setBodyMode('my-tpls');
     this._renderMyTemplatesGrid();
   },
