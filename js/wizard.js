@@ -3,7 +3,8 @@
    ======================================================= */
 
 window.APP_STATE = {
-  tipo: null,        // 'biglietto' | 'striscione' | 'certificato' | 'segnalibro' | 'invito' | 'colora'
+  tipo: null,        // 'biglietto' | 'striscione' | 'certificato' | 'segnalibro' | 'invito' | 'colora' | 'libero'
+                     // ('colora' e 'libero' sono entry-point dal menu home, non dal wizard)
   template: null,    // oggetto template scelto
   testi: {},         // { campo: 'valore', ... }
   font: 'Baloo 2'
@@ -14,8 +15,7 @@ const TIPI = [
   { id: 'striscione',  nome: 'Striscione',  emoji: '🎉' },
   { id: 'certificato', nome: 'Certificato', emoji: '🏆' },
   { id: 'segnalibro',  nome: 'Segnalibro',  emoji: '🔖' },
-  { id: 'invito',      nome: 'Invito',      emoji: '✉️' },
-  { id: 'colora',      nome: 'Colora',      emoji: '🎨' }
+  { id: 'invito',      nome: 'Invito',      emoji: '✉️' }
 ];
 
 const CAMPI_PER_TIPO = {
@@ -129,13 +129,7 @@ function renderStep1() {
     }
   }
 
-  btnNext.addEventListener('click', () => {
-    if (window.APP_STATE.tipo === 'colora') {
-      goToStep('colora');
-    } else {
-      goToStep(2);
-    }
-  });
+  btnNext.addEventListener('click', () => goToStep(2));
 }
 
 /* ---------- STEP 2 ---------- */
@@ -372,9 +366,9 @@ function renderStep3() {
   });
 }
 
-/* ---------- STEP COLORA ---------- */
-async function renderStepColora() {
-  const root = document.getElementById('step-colora');
+/* ---------- SCHERMATA COLORA (entry-point dal menu home) ---------- */
+async function renderScreenColora() {
+  const root = document.getElementById('screen-colora');
   if (!root) return;
 
   // markup iniziale (placeholder finché non carico il manifest)
@@ -395,12 +389,16 @@ async function renderStepColora() {
     </div>
 
     <div class="nav-buttons">
-      <button class="btn btn-secondary" id="btn-prev-colora">← Indietro</button>
+      <button class="btn btn-secondary" id="btn-prev-colora">← Torna al menu</button>
     </div>
   `;
 
-  // back: torna allo Step 1
-  root.querySelector('#btn-prev-colora').addEventListener('click', () => goToStep(1));
+  // back: torna al menu home
+  root.querySelector('#btn-prev-colora').addEventListener('click', () => {
+    if (window.editor && typeof window.editor._showMenu === 'function') {
+      window.editor._showMenu();
+    }
+  });
 
   // upload (handler completo nel Task 9)
   const fileInput = root.querySelector('#colora-file-input');
@@ -537,6 +535,8 @@ async function loadColoraDrawing(file) {
 }
 
 function openColoraEditor(prepared) {
+  // assicura che tipo sia 'colora' (entry-point dal menu, non dal wizard)
+  window.APP_STATE.tipo = 'colora';
   window.APP_STATE.template = {
     nome: 'Colora',
     background: '#FFFFFF',
@@ -635,43 +635,33 @@ function goToStep(n) {
     s.hidden = true;
   });
 
-  // 'colora' è un id-string speciale, non un numero
-  const targetId = (n === 'colora') ? 'step-colora' : `step${n}`;
-  const target = document.getElementById(targetId);
+  const target = document.getElementById(`step${n}`);
   if (!target) return;
   target.hidden = false;
   target.classList.add('active');
 
-  // step-bar dinamica
   updateStepBar(n);
 
-  if (n === 1)             renderStep1();
-  else if (n === 2)        renderStep2();
-  else if (n === 3)        renderStep3();
-  else if (n === 'colora') renderStepColora();
+  if (n === 1)      renderStep1();
+  else if (n === 2) renderStep2();
+  else if (n === 3) renderStep3();
 }
 
 function updateStepBar(n) {
   const bar = document.querySelector('.step-bar');
   if (!bar) return;
-  const tipo = window.APP_STATE && window.APP_STATE.tipo;
 
-  // configurazione step a seconda del tipo
-  const config = (tipo === 'colora')
-    ? [{ num: 1, label: 'Tipo' }, { num: 2, label: 'Disegno' }]
-    : [{ num: 1, label: 'Tipo' }, { num: 2, label: 'Tema' }, { num: 3, label: 'Testi' }];
-
-  // numero "corrente" come indice 1-based nella sequenza config
-  let currentIdx;
-  if (n === 1)             currentIdx = 1;
-  else if (n === 'colora') currentIdx = 2;
-  else                     currentIdx = n;
+  const config = [
+    { num: 1, label: 'Tipo' },
+    { num: 2, label: 'Tema' },
+    { num: 3, label: 'Testi' }
+  ];
 
   bar.innerHTML = config.map((s, i) => {
     const isLast = i === config.length - 1;
     const stepNum = i + 1;
-    const cls = stepNum < currentIdx ? 'step completed'
-              : stepNum === currentIdx ? 'step active'
+    const cls = stepNum < n ? 'step completed'
+              : stepNum === n ? 'step active'
               : 'step';
     return `
       <div class="${cls}" data-step="${stepNum}">
@@ -684,15 +674,22 @@ function updateStepBar(n) {
 }
 
 function restartWizard() {
+  // azzera lo stato e torna al menu home: l'utente sceglie da lì
+  // se proseguire col wizard, con la modalità Colora o con Crea libero
   window.APP_STATE = {
     tipo: null,
     template: null,
     testi: {},
     font: 'Baloo 2'
   };
-  document.getElementById('editor').hidden = true;
-  document.getElementById('wizard').hidden = false;
-  goToStep(1);
+  if (window.editor && typeof window.editor._showMenu === 'function') {
+    window.editor._showMenu();
+  } else {
+    // fallback per sicurezza (non dovrebbe accadere a runtime)
+    document.getElementById('editor').hidden = true;
+    document.getElementById('wizard').hidden = false;
+    goToStep(1);
+  }
 }
 
 /* ---------- Utility ---------- */
@@ -713,4 +710,4 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // esponi per uso da altri file
-window.wizard = { goToStep, restartWizard };
+window.wizard = { goToStep, restartWizard, renderScreenColora };

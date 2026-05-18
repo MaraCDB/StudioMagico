@@ -269,13 +269,16 @@ window.editor = {
     document.body.classList.add('print-' + state.tipo);
     this._injectPrintPageStyle(state.tipo);
 
-    // body mode: editor da wizard vs editor da "crea libero"
+    // body mode: editor da wizard vs editor da "crea libero" vs editor da "colora"
     document.body.classList.remove(
-      'mode-menu', 'mode-wizard', 'mode-free',
-      'mode-editor-wizard', 'mode-editor-free',
+      'mode-menu', 'mode-wizard', 'mode-free', 'mode-colora',
+      'mode-editor-wizard', 'mode-editor-free', 'mode-editor-colora',
       'mode-my-tpls', 'mode-drafts'
     );
-    document.body.classList.add(state.freeMode ? 'mode-editor-free' : 'mode-editor-wizard');
+    let editorMode = 'mode-editor-wizard';
+    if (state.freeMode)             editorMode = 'mode-editor-free';
+    else if (state.tipo === 'colora') editorMode = 'mode-editor-colora';
+    document.body.classList.add(editorMode);
 
     // 1. nascondi wizard, mostra editor
     const wizard = document.getElementById('wizard');
@@ -2551,11 +2554,13 @@ window.editor = {
   _showMenu() {
     const screenMenu   = document.getElementById('screen-menu');
     const screenFree   = document.getElementById('screen-free');
+    const screenColora = document.getElementById('screen-colora');
     const screenMyTpl  = document.getElementById('screen-my-templates');
     const screenDrafts = document.getElementById('screen-drafts');
     const wizard       = document.getElementById('wizard');
     const editorEl     = document.getElementById('editor');
     if (screenFree)   screenFree.hidden   = true;
+    if (screenColora) screenColora.hidden = true;
     if (screenMyTpl)  screenMyTpl.hidden  = true;
     if (screenDrafts) screenDrafts.hidden = true;
     if (wizard)       wizard.hidden       = true;
@@ -2570,12 +2575,14 @@ window.editor = {
   _showWizard() {
     const screenMenu   = document.getElementById('screen-menu');
     const screenFree   = document.getElementById('screen-free');
+    const screenColora = document.getElementById('screen-colora');
     const screenMyTpl  = document.getElementById('screen-my-templates');
     const screenDrafts = document.getElementById('screen-drafts');
     const wizard       = document.getElementById('wizard');
     const editorEl     = document.getElementById('editor');
     if (screenMenu)   screenMenu.hidden   = true;
     if (screenFree)   screenFree.hidden   = true;
+    if (screenColora) screenColora.hidden = true;
     if (screenMyTpl)  screenMyTpl.hidden  = true;
     if (screenDrafts) screenDrafts.hidden = true;
     if (editorEl)     editorEl.hidden     = true;
@@ -2587,17 +2594,41 @@ window.editor = {
   _showScreenFree() {
     const screenMenu   = document.getElementById('screen-menu');
     const screenFree   = document.getElementById('screen-free');
+    const screenColora = document.getElementById('screen-colora');
     const screenMyTpl  = document.getElementById('screen-my-templates');
     const screenDrafts = document.getElementById('screen-drafts');
     const wizard       = document.getElementById('wizard');
     const editorEl     = document.getElementById('editor');
     if (screenMenu)   screenMenu.hidden   = true;
+    if (screenColora) screenColora.hidden = true;
     if (screenMyTpl)  screenMyTpl.hidden  = true;
     if (screenDrafts) screenDrafts.hidden = true;
     if (wizard)       wizard.hidden       = true;
     if (editorEl)     editorEl.hidden     = true;
     if (screenFree)   screenFree.hidden   = false;
     this._setBodyMode('free');
+  },
+
+  /** Mostra la schermata "Colora" (galleria disegni + upload da PC). */
+  _showColora() {
+    const screenMenu   = document.getElementById('screen-menu');
+    const screenFree   = document.getElementById('screen-free');
+    const screenColora = document.getElementById('screen-colora');
+    const screenMyTpl  = document.getElementById('screen-my-templates');
+    const screenDrafts = document.getElementById('screen-drafts');
+    const wizard       = document.getElementById('wizard');
+    const editorEl     = document.getElementById('editor');
+    if (screenMenu)   screenMenu.hidden   = true;
+    if (screenFree)   screenFree.hidden   = true;
+    if (screenMyTpl)  screenMyTpl.hidden  = true;
+    if (screenDrafts) screenDrafts.hidden = true;
+    if (wizard)       wizard.hidden       = true;
+    if (editorEl)     editorEl.hidden     = true;
+    if (screenColora) screenColora.hidden = false;
+    this._setBodyMode('colora');
+    if (window.wizard && typeof window.wizard.renderScreenColora === 'function') {
+      window.wizard.renderScreenColora();
+    }
   },
 
   /**
@@ -2607,8 +2638,8 @@ window.editor = {
    */
   _setBodyMode(mode) {
     document.body.classList.remove(
-      'mode-menu', 'mode-wizard', 'mode-free',
-      'mode-editor-wizard', 'mode-editor-free',
+      'mode-menu', 'mode-wizard', 'mode-free', 'mode-colora',
+      'mode-editor-wizard', 'mode-editor-free', 'mode-editor-colora',
       'mode-my-tpls', 'mode-drafts'
     );
     if (mode) document.body.classList.add('mode-' + mode);
@@ -2624,6 +2655,11 @@ window.editor = {
     if (btnWizard && !btnWizard._menuWired) {
       btnWizard._menuWired = true;
       btnWizard.addEventListener('click', () => this._showWizard());
+    }
+    const btnColora = document.getElementById('path-colora');
+    if (btnColora && !btnColora._menuWired) {
+      btnColora._menuWired = true;
+      btnColora.addEventListener('click', () => this._showColora());
     }
     const btnFree = document.getElementById('path-free');
     if (btnFree && !btnFree._menuWired) {
@@ -3096,12 +3132,14 @@ window.editor = {
   _showMyTemplates() {
     const screenMenu   = document.getElementById('screen-menu');
     const screenFree   = document.getElementById('screen-free');
+    const screenColora = document.getElementById('screen-colora');
     const screenMyTpl  = document.getElementById('screen-my-templates');
     const screenDrafts = document.getElementById('screen-drafts');
     const wizard       = document.getElementById('wizard');
     const editorEl     = document.getElementById('editor');
     if (screenMenu)   screenMenu.hidden   = true;
     if (screenFree)   screenFree.hidden   = true;
+    if (screenColora) screenColora.hidden = true;
     if (screenDrafts) screenDrafts.hidden = true;
     if (wizard)       wizard.hidden       = true;
     if (editorEl)     editorEl.hidden     = true;
@@ -3341,12 +3379,14 @@ window.editor = {
   _showDrafts() {
     const screenMenu    = document.getElementById('screen-menu');
     const screenFree    = document.getElementById('screen-free');
+    const screenColora  = document.getElementById('screen-colora');
     const screenMyTpl   = document.getElementById('screen-my-templates');
     const screenDrafts  = document.getElementById('screen-drafts');
     const wizard        = document.getElementById('wizard');
     const editorEl      = document.getElementById('editor');
     if (screenMenu)   screenMenu.hidden   = true;
     if (screenFree)   screenFree.hidden   = true;
+    if (screenColora) screenColora.hidden = true;
     if (screenMyTpl)  screenMyTpl.hidden  = true;
     if (wizard)       wizard.hidden       = true;
     if (editorEl)     editorEl.hidden     = true;

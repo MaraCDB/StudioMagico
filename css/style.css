@@ -246,6 +246,11 @@ button {
   transform: translateY(-8px) rotate(1deg);
 }
 
+.path-card-colora:hover {
+  border-color: var(--giallo);
+  transform: translateY(-8px) rotate(0deg) scale(1.02);
+}
+
 .path-emoji {
   font-size: 80px;
   line-height: 1;
@@ -258,6 +263,10 @@ button {
 
 .path-card-alt:hover .path-emoji {
   transform: scale(1.15) rotate(6deg);
+}
+
+.path-card-colora:hover .path-emoji {
+  transform: scale(1.2) rotate(-4deg);
 }
 
 .path-name {
@@ -276,7 +285,9 @@ button {
 /* nascondi la step-bar quando NON siamo nel flusso wizard */
 body.mode-menu .step-bar,
 body.mode-free .step-bar,
-body.mode-editor-free .step-bar {
+body.mode-colora .step-bar,
+body.mode-editor-free .step-bar,
+body.mode-editor-colora .step-bar {
   display: none;
 }
 
@@ -3097,7 +3108,7 @@ body.mode-my-tpls .step-bar {
 }
 
 /* ===== Sezione COLORA — galleria, upload, step-bar 2 step ===== */
-#step-colora {
+#screen-colora {
   max-width: 1100px;
   margin: 0 auto;
   padding: 24px 16px 80px;
