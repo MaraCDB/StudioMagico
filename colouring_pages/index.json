@@ -1,5 +1,20 @@
 {
   "drawings": [
-    { "file": "gatto.svg", "name": "Gatto", "category": "animali", "emoji": "🐱" }
+    { "file": "gatto.png",            "name": "Gatto",              "category": "animali",  "emoji": "🐱" },
+    { "file": "gatto_casa.jfif",      "name": "Gatto a casa",       "category": "animali",  "emoji": "🐱" },
+    { "file": "cane_passeggiata.png", "name": "Cane in passeggiata","category": "animali",  "emoji": "🐕" },
+    { "file": "cane_parco.jfif",      "name": "Cane al parco",      "category": "animali",  "emoji": "🐕" },
+    { "file": "coniglio.jfif",        "name": "Coniglio",           "category": "animali",  "emoji": "🐰" },
+    { "file": "gufo.png",             "name": "Gufo",               "category": "animali",  "emoji": "🦉" },
+    { "file": "gufo2.jfif",           "name": "Gufo 2",             "category": "animali",  "emoji": "🦉" },
+    { "file": "torta.jfif",           "name": "Torta",              "category": "festa",    "emoji": "🎂" },
+    { "file": "torta_semplice.png",   "name": "Torta semplice",     "category": "festa",    "emoji": "🎂" },
+    { "file": "torta1.jfif",          "name": "Torta 1",            "category": "festa",    "emoji": "🎂" },
+    { "file": "torta2.png",           "name": "Torta 2",            "category": "festa",    "emoji": "🎂" },
+    { "file": "palloncini.png",       "name": "Palloncini",         "category": "festa",    "emoji": "🎈" },
+    { "file": "regali.jfif",          "name": "Regali",             "category": "festa",    "emoji": "🎁" },
+    { "file": "castello.jfif",        "name": "Castello",           "category": "fantasia", "emoji": "🏰" },
+    { "file": "arcobaleno.jfif",      "name": "Arcobaleno",         "category": "fantasia", "emoji": "🌈" },
+    { "file": "parco.jfif",           "name": "Parco",              "category": "natura",   "emoji": "🌳" }
   ]
 }
