@@ -206,6 +206,12 @@ window.editor = {
     }
     state.tapeInProgress = null;
 
+    // assicura che lo stato delle foto esista
+    if (!Array.isArray(state.photos)) {
+      state.photos = [];
+    }
+    state.selectedPhotoId = null;
+
     // assicura che lo stato di colore/pennello esista
     if (!state.coloredZones || typeof state.coloredZones !== 'object') {
       state.coloredZones = {};
@@ -241,9 +247,11 @@ window.editor = {
       state.textElements = JSON.parse(JSON.stringify(snap.textElements || []));
       state.tapes        = JSON.parse(JSON.stringify(snap.tapes        || []));
       state.coloredZones = JSON.parse(JSON.stringify(snap.coloredZones || {}));
+      state.photos       = JSON.parse(JSON.stringify(snap.photos       || []));
       state.testi = {};
       state.selectedTextId = null;
       state.tapeInProgress = null;
+      state.selectedPhotoId = null;
     }
     // consuma il flag (non deve persistere oltre questa init)
     delete state._restoredFromDraft;
@@ -319,6 +327,9 @@ window.editor = {
     // 7. renderizza i tape già presenti nello stato
     this.renderTapes();
 
+    // 7-bis. renderizza le foto caricate dall'utente
+    this.renderPhotos();
+
     // 8. (rimosso) forme colorabili di test — ora vengono dal template SVG
 
     // 9. riapplica i colori salvati alle zone colorabili
@@ -348,6 +359,9 @@ window.editor = {
     }
     if (window.tools && window.tools.color && typeof window.tools.color.init === 'function') {
       window.tools.color.init();
+    }
+    if (window.tools && window.tools.photo && typeof window.tools.photo.init === 'function') {
+      window.tools.photo.init();
     }
     if (window.tools && window.tools.background && typeof window.tools.background.init === 'function') {
       window.tools.background.init();
@@ -795,6 +809,292 @@ window.editor = {
   },
 
   /* =====================================================
+     FOTO — caricate da PC, drag + resize + rotate
+     ===================================================== */
+
+  /**
+   * Aggiunge una foto al canvas e allo stato. Chiamata da tools.js
+   * dopo aver compresso il file caricato dall'utente.
+   * @param {string} src   dataURL della foto (già compressa)
+   * @param {number} aspect rapporto W/H dell'immagine originale (per height auto)
+   */
+  addPhoto(src, aspect) {
+    if (!src) return;
+    this.saveSnapshot();
+    if (!Array.isArray(window.APP_STATE.photos)) {
+      window.APP_STATE.photos = [];
+    }
+    const id = 'ph_' + Date.now().toString(36) + '_' +
+               Math.random().toString(36).slice(2, 7);
+    // larghezza default 35% del canvas, centrata
+    const defaultWPct = 35;
+    const safeAspect = (typeof aspect === 'number' && aspect > 0) ? aspect : 1;
+    const data = {
+      id,
+      src,
+      aspect: safeAspect,
+      widthPct: defaultWPct,
+      // x,y posizione del CENTRO della foto in % del canvas
+      xPct: 50,
+      yPct: 50,
+      rotation: 0
+    };
+    window.APP_STATE.photos.push(data);
+    this._createPhotoEl(data);
+    this._selectPhoto(id);
+  },
+
+  /**
+   * Ricrea i .photo-el dal DOM in base a APP_STATE.photos.
+   */
+  renderPhotos() {
+    const canvas = document.getElementById('card-canvas');
+    if (!canvas) return;
+    canvas.querySelectorAll('.photo-el').forEach(el => el.remove());
+    const list = Array.isArray(window.APP_STATE.photos)
+      ? window.APP_STATE.photos : [];
+    list.forEach(data => this._createPhotoEl(data));
+  },
+
+  /**
+   * Costruisce il div .photo-el con img + handle resize + handle rotate
+   * + bottone elimina, e collega i listener.
+   * @private
+   */
+  _createPhotoEl(data) {
+    const canvas = document.getElementById('card-canvas');
+    if (!canvas) return null;
+
+    const el = document.createElement('div');
+    el.className = 'photo-el';
+    el.dataset.id = data.id;
+    this._applyPhotoStyle(el, data);
+
+    const img = document.createElement('img');
+    img.draggable = false;
+    img.src = data.src;
+    img.alt = '';
+    el.appendChild(img);
+
+    // 4 maniglie agli angoli (resize uniforme da centro)
+    ['tl', 'tr', 'bl', 'br'].forEach(pos => {
+      const h = document.createElement('div');
+      h.className = 'photo-handle photo-handle-' + pos;
+      el.appendChild(h);
+      this._attachPhotoResize(el, h, data);
+    });
+
+    // maniglia rotazione (sopra la foto)
+    const rotH = document.createElement('div');
+    rotH.className = 'photo-rotate-handle';
+    rotH.innerHTML = '⟳';
+    el.appendChild(rotH);
+    this._attachPhotoRotate(el, rotH, data);
+
+    // bottone elimina (in alto a destra)
+    const delBtn = document.createElement('div');
+    delBtn.className = 'photo-delete-btn';
+    delBtn.textContent = '×';
+    delBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+    delBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this._removePhoto(data.id);
+    });
+    el.appendChild(delBtn);
+
+    // click sul corpo seleziona; mousedown sul corpo (non sulle maniglie)
+    // avvia il drag per spostare la foto
+    el.addEventListener('mousedown', (e) => {
+      // se il mousedown è su una maniglia o sul bottone elimina, lascia perdere
+      if (e.target.classList.contains('photo-handle')   ||
+          e.target.classList.contains('photo-rotate-handle') ||
+          e.target.classList.contains('photo-delete-btn')) {
+        return;
+      }
+      e.stopPropagation();
+      this._selectPhoto(data.id);
+      this._attachPhotoMoveDrag(el, data, e);
+    });
+
+    canvas.appendChild(el);
+    return el;
+  },
+
+  /**
+   * Applica left/top/width/transform al .photo-el in base ai dati.
+   * @private
+   */
+  _applyPhotoStyle(el, data) {
+    // left/top puntano al top-left dell'elemento, ma noi tracciamo il CENTRO.
+    // L'elemento è position:absolute, width in %, height auto.
+    // Calcoliamo top-left in % a partire da centro e width.
+    // L'altezza in % dipende dal canvas: heightPx = widthPx / aspect →
+    //   heightPct = widthPct * (canvasW / canvasH) / aspect.
+    // Per semplicità usiamo transform translate(-50%, -50%) così
+    //   left/top corrispondono al centro e non dobbiamo calcolare l'altezza.
+    el.style.position = 'absolute';
+    el.style.left = data.xPct + '%';
+    el.style.top  = data.yPct + '%';
+    el.style.width = data.widthPct + '%';
+    el.style.transform = `translate(-50%, -50%) rotate(${data.rotation || 0}deg)`;
+  },
+
+  /**
+   * Gestisce il drag del corpo foto: aggiorna xPct/yPct (centro).
+   * Avviato dal mousedown sul corpo (non sulle maniglie).
+   * @private
+   */
+  _attachPhotoMoveDrag(el, data, startEvent) {
+    const canvas = document.getElementById('card-canvas');
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const cw = rect.width, ch = rect.height;
+    const startMouseX = startEvent.clientX;
+    const startMouseY = startEvent.clientY;
+    const startX = data.xPct;
+    const startY = data.yPct;
+    let moved = false;
+
+    const onMove = (e) => {
+      const dx = e.clientX - startMouseX;
+      const dy = e.clientY - startMouseY;
+      const dxPct = cw ? (dx / cw) * 100 : 0;
+      const dyPct = ch ? (dy / ch) * 100 : 0;
+      data.xPct = Math.max(0, Math.min(100, startX + dxPct));
+      data.yPct = Math.max(0, Math.min(100, startY + dyPct));
+      this._applyPhotoStyle(el, data);
+      moved = true;
+    };
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      if (moved) this.saveSnapshot();
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  },
+
+  /**
+   * Aggancia il resize uniforme su una maniglia agli angoli.
+   * Il centro della foto resta fisso; il fattore di scala è dato
+   * dalla distanza cursore→centro relativa a quella iniziale.
+   * @private
+   */
+  _attachPhotoResize(el, handle, data) {
+    handle.addEventListener('mousedown', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const canvas = document.getElementById('card-canvas');
+      if (!canvas) return;
+
+      const elRect = el.getBoundingClientRect();
+      const centerX = elRect.left + elRect.width / 2;
+      const centerY = elRect.top  + elRect.height / 2;
+      const dx0 = e.clientX - centerX;
+      const dy0 = e.clientY - centerY;
+      const d0  = Math.hypot(dx0, dy0) || 1;
+      const w0  = data.widthPct;
+      let moved = false;
+
+      const onMove = (ev) => {
+        const dx = ev.clientX - centerX;
+        const dy = ev.clientY - centerY;
+        const d  = Math.hypot(dx, dy);
+        const scale = d / d0;
+        // clamp 5%..95% del canvas
+        data.widthPct = Math.max(5, Math.min(95, w0 * scale));
+        this._applyPhotoStyle(el, data);
+        moved = true;
+      };
+      const onUp = () => {
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        if (moved) this.saveSnapshot();
+      };
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+  },
+
+  /**
+   * Aggancia il drag della maniglia di rotazione.
+   * @private
+   */
+  _attachPhotoRotate(el, handle, data) {
+    handle.addEventListener('mousedown', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+
+      const elRect = el.getBoundingClientRect();
+      const centerX = elRect.left + elRect.width / 2;
+      const centerY = elRect.top  + elRect.height / 2;
+      const a0 = Math.atan2(e.clientY - centerY, e.clientX - centerX);
+      const r0 = data.rotation || 0;
+      let moved = false;
+
+      const onMove = (ev) => {
+        const a = Math.atan2(ev.clientY - centerY, ev.clientX - centerX);
+        const deltaDeg = ((a - a0) * 180) / Math.PI;
+        data.rotation = (r0 + deltaDeg) % 360;
+        this._applyPhotoStyle(el, data);
+        moved = true;
+      };
+      const onUp = () => {
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        if (moved) this.saveSnapshot();
+      };
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+  },
+
+  /**
+   * Mostra le maniglie sulla foto selezionata e nasconde sulle altre.
+   * @private
+   */
+  _selectPhoto(id) {
+    window.APP_STATE.selectedPhotoId = id;
+    const canvas = document.getElementById('card-canvas');
+    if (!canvas) return;
+    canvas.querySelectorAll('.photo-el').forEach(el => {
+      el.classList.toggle('selected', el.dataset.id === id);
+    });
+  },
+
+  /**
+   * Deseleziona tutte le foto.
+   * @private
+   */
+  _deselectAllPhotos() {
+    window.APP_STATE.selectedPhotoId = null;
+    const canvas = document.getElementById('card-canvas');
+    if (!canvas) return;
+    canvas.querySelectorAll('.photo-el.selected').forEach(el => {
+      el.classList.remove('selected');
+    });
+  },
+
+  /**
+   * Rimuove una foto dallo stato e dal DOM.
+   * @private
+   */
+  _removePhoto(id) {
+    this.saveSnapshot();
+    const canvas = document.getElementById('card-canvas');
+    if (canvas) {
+      const el = canvas.querySelector(`.photo-el[data-id="${id}"]`);
+      if (el) el.remove();
+    }
+    if (Array.isArray(window.APP_STATE.photos)) {
+      window.APP_STATE.photos = window.APP_STATE.photos.filter(p => p.id !== id);
+    }
+    if (window.APP_STATE.selectedPhotoId === id) {
+      window.APP_STATE.selectedPhotoId = null;
+    }
+  },
+
+  /* =====================================================
      TESTI LIBERI — aggiungi / sposta / modifica / rimuovi
      ===================================================== */
 
@@ -1147,6 +1447,7 @@ window.editor = {
         this.addTextElement(x, y);
       } else {
         this.deselectAllTextElements();
+        this._deselectAllPhotos();
       }
     });
   },
@@ -2733,7 +3034,8 @@ window.editor = {
         stickers:     JSON.parse(JSON.stringify(state.stickers     || [])),
         textElements: JSON.parse(JSON.stringify(state.textElements || [])),
         tapes:        JSON.parse(JSON.stringify(state.tapes        || [])),
-        coloredZones: JSON.parse(JSON.stringify(state.coloredZones || {}))
+        coloredZones: JSON.parse(JSON.stringify(state.coloredZones || {})),
+        photos:       JSON.parse(JSON.stringify(state.photos       || []))
         // brushStrokes intenzionalmente escluso (troppo pesante)
       }
     };

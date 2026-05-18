@@ -1603,3 +1603,121 @@ window.tools.background = {
       `linear-gradient(${this._gradDir}, ${this._gradColor1} 0%, ${this._gradColor2} 100%)`;
   }
 };
+
+/* =========================================================
+   TOOL FOTO  📷
+   Carica una foto dal computer, la comprime e la aggiunge
+   al canvas come elemento trascinabile/ridimensionabile/ruotabile.
+   ========================================================= */
+window.tools.photo = {
+  buttonEl: null,
+  fileInputEl: null,
+
+  init() {
+    this.destroy();
+    const toolbar = document.getElementById('toolbar');
+    if (!toolbar) return;
+
+    // bottone toolbar
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'tool-btn';
+    btn.dataset.tool = 'photo';
+    btn.title = 'Carica una foto dal computer';
+    btn.innerHTML =
+      '<span class="tool-btn-icon" aria-hidden="true">📷</span>' +
+      '<span class="tool-btn-label">Foto</span>';
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this._openPicker();
+    });
+    toolbar.appendChild(btn);
+    this.buttonEl = btn;
+
+    // file input nascosto
+    const fi = document.createElement('input');
+    fi.type = 'file';
+    fi.accept = '.png,.jpg,.jpeg,.jfif,image/png,image/jpeg';
+    fi.hidden = true;
+    fi.style.display = 'none';
+    fi.addEventListener('change', (e) => this._onFileChange(e));
+    toolbar.appendChild(fi);
+    this.fileInputEl = fi;
+  },
+
+  destroy() {
+    if (this.buttonEl)    { this.buttonEl.remove();    this.buttonEl = null; }
+    if (this.fileInputEl) { this.fileInputEl.remove(); this.fileInputEl = null; }
+  },
+
+  _openPicker() {
+    if (this.fileInputEl) this.fileInputEl.click();
+  },
+
+  async _onFileChange(e) {
+    const input = e.target;
+    const file = input.files && input.files[0];
+    input.value = ''; // reset così l'utente può ricaricare lo stesso file
+    if (!file) return;
+
+    const MAX_BYTES = 10 * 1024 * 1024; // 10 MB raw
+    if (file.size > MAX_BYTES) {
+      alert('Foto troppo grande. Scegline una di massimo 10 MB.');
+      return;
+    }
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    if (!['png', 'jpg', 'jpeg', 'jfif'].includes(ext)) {
+      alert('Formato non supportato. Usa PNG, JPG o JFIF.');
+      return;
+    }
+
+    let result;
+    try {
+      result = await this._compressImage(file);
+    } catch (err) {
+      alert('Errore nel caricamento della foto: ' + err.message);
+      return;
+    }
+    if (window.editor && typeof window.editor.addPhoto === 'function') {
+      window.editor.addPhoto(result.src, result.aspect);
+    }
+  },
+
+  /**
+   * Comprime un'immagine: ridimensiona a max 1200px sul lato lungo,
+   * ricomprime come JPEG qualità 0.85. Ritorna {src: dataURL, aspect}.
+   * @private
+   */
+  _compressImage(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error('lettura file fallita'));
+      reader.onload = () => {
+        const img = new Image();
+        img.onerror = () => reject(new Error('immagine non valida'));
+        img.onload = () => {
+          const MAX_DIM = 1200;
+          let w = img.naturalWidth, h = img.naturalHeight;
+          if (!w || !h) {
+            reject(new Error('dimensioni immagine non valide'));
+            return;
+          }
+          const aspect = w / h;
+          if (Math.max(w, h) > MAX_DIM) {
+            if (w >= h) { h = Math.round(h * MAX_DIM / w); w = MAX_DIM; }
+            else        { w = Math.round(w * MAX_DIM / h); h = MAX_DIM; }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width  = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          const src = canvas.toDataURL('image/jpeg', 0.85);
+          resolve({ src, aspect });
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+};

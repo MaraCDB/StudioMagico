@@ -3190,3 +3190,112 @@ body.mode-my-tpls .step-bar {
   .colora-card-emoji { font-size: 32px; }
   .colora-card-name { font-size: 13px; }
 }
+
+/* ===== FOTO — elementi caricati dall'utente sul canvas ===== */
+.photo-el {
+  /* left/top puntano al CENTRO della foto (vedi _applyPhotoStyle) */
+  /* width è in %, height = auto preserva l'aspect ratio dell'<img> */
+  z-index: 5;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+.photo-el:active { cursor: grabbing; }
+
+.photo-el img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;        /* il click viene gestito dal contenitore */
+  -webkit-user-drag: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  border-radius: 6px;
+}
+
+/* Maniglie e bottone elimina nascosti finché la foto non è selezionata */
+.photo-handle,
+.photo-rotate-handle,
+.photo-delete-btn {
+  display: none;
+}
+
+.photo-el.selected {
+  outline: 2px dashed rgba(199, 125, 255, 0.9);
+  outline-offset: 4px;
+}
+.photo-el.selected .photo-handle,
+.photo-el.selected .photo-rotate-handle,
+.photo-el.selected .photo-delete-btn {
+  display: block;
+}
+
+/* Maniglie di resize agli angoli */
+.photo-handle {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: #FFFFFF;
+  border: 2px solid #C77DFF;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  cursor: nwse-resize;
+  z-index: 6;
+}
+.photo-handle-tl { top: -10px;    left: -10px;   cursor: nwse-resize; }
+.photo-handle-tr { top: -10px;    right: -10px;  cursor: nesw-resize; }
+.photo-handle-bl { bottom: -10px; left: -10px;   cursor: nesw-resize; }
+.photo-handle-br { bottom: -10px; right: -10px;  cursor: nwse-resize; }
+
+/* Maniglia di rotazione sopra la foto */
+.photo-rotate-handle {
+  position: absolute;
+  top: -42px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, #FF6B9D, #C77DFF);
+  color: #FFFFFF;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 28px;
+  cursor: grab;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 6;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.photo-rotate-handle:active { cursor: grabbing; }
+
+/* Bottone elimina in alto a destra */
+.photo-delete-btn {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 26px;
+  height: 26px;
+  background: #FF5252;
+  color: #FFFFFF;
+  border-radius: 50%;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 24px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  z-index: 7;
+}
+.photo-delete-btn:hover {
+  background: #D32F2F;
+  transform: scale(1.1);
+}
+
+/* In stampa: nascondi maniglie e selezione */
+body.printing .photo-handle,
+body.printing .photo-rotate-handle,
+body.printing .photo-delete-btn { display: none !important; }
+body.printing .photo-el.selected { outline: none; }
+body.printing .photo-el img { box-shadow: none; }
