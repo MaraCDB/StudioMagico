@@ -1866,14 +1866,16 @@ body.mode-editor-colora .step-bar {
 
 .color-tab.color-tab-disabled,
 .color-tab:disabled {
-  opacity: 0.45;
+  opacity: 0.6;
   cursor: not-allowed;
-  filter: grayscale(0.6);
+  background: #F0EAF7;
+  color: #998AAE;
 }
 .color-tab.color-tab-disabled:hover,
 .color-tab:disabled:hover {
-  background: var(--crema);
+  background: #F0EAF7;
   border-color: transparent;
+  transform: none;
 }
 
 .color-tab-content[hidden] { display: none; }
