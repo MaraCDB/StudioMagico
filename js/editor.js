@@ -1820,10 +1820,11 @@ window.editor = {
 
   /**
    * Pulisce il brush-canvas e ridisegna tutti i tratti in
-   * APP_STATE.brushStrokes. Le coordinate dei punti sono
-   * normalizzate in [0,1] rispetto al brush-canvas.
+   * APP_STATE.brushStrokes. I tratti possono essere line-strokes
+   * ({color, size, points[]}) oppure flood fill ({type:'fill', x, y, color}).
+   * Async perché il replay dei fill richiede il rendering offscreen dell'SVG.
    */
-  redrawBrush() {
+  async redrawBrush() {
     const brushCanvas = document.getElementById('brush-canvas');
     if (!brushCanvas) return;
     const ctx = brushCanvas.getContext('2d');
@@ -1833,7 +1834,30 @@ window.editor = {
     const strokes = Array.isArray(window.APP_STATE.brushStrokes)
       ? window.APP_STATE.brushStrokes
       : [];
-    strokes.forEach(stroke => this._drawBrushStroke(ctx, stroke));
+    for (const stroke of strokes) {
+      if (stroke && stroke.type === 'fill') {
+        await this._replayFillStroke(brushCanvas, stroke);
+      } else {
+        this._drawBrushStroke(ctx, stroke);
+      }
+    }
+  },
+
+  /**
+   * Riesegue un fill stroke sul brush canvas. Usa il flood fill di
+   * window.tools.color con il reference canvas pre-renderizzato.
+   * @private
+   */
+  async _replayFillStroke(brushCanvas, stroke) {
+    if (!window.tools || !window.tools.color) return;
+    const color = window.tools.color;
+    if (typeof color._ensureReferenceCanvas !== 'function') return;
+    const ref = await color._ensureReferenceCanvas();
+    if (!ref) return;
+    const w = brushCanvas.width, h = brushCanvas.height;
+    const px = Math.floor((stroke.x || 0) * w);
+    const py = Math.floor((stroke.y || 0) * h);
+    color._doFloodFill(brushCanvas, ref, px, py, stroke.color || '#FF6B9D');
   },
 
   /**
@@ -1841,7 +1865,8 @@ window.editor = {
    * @private
    */
   _drawBrushStroke(ctx, stroke) {
-    if (!stroke || !Array.isArray(stroke.points) || stroke.points.length === 0) return;
+    if (!stroke || stroke.type === 'fill') return; // i fill stroke sono gestiti in _replayFillStroke
+    if (!Array.isArray(stroke.points) || stroke.points.length === 0) return;
     const cw = ctx.canvas.width;
     const ch = ctx.canvas.height;
 

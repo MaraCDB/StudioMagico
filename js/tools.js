@@ -902,20 +902,6 @@ window.tools.color = {
     this._bindPanelEvents();
     this._syncPanelSelection();
 
-    // disabilita il secchiello se il template è un coloring page senza zone .colorable
-    // (es. PNG/JPG caricato dall'utente, o SVG senza path .colorable)
-    const tpl = window.APP_STATE && window.APP_STATE.template;
-    if (tpl && tpl.isColoringPage && !tpl.hasColorable) {
-      const bucketBtn = panel.querySelector('.color-tab[data-tab="bucket"]');
-      if (bucketBtn) {
-        bucketBtn.disabled = true;
-        bucketBtn.title = 'Disponibile solo su disegni preparati con zone colorabili';
-        bucketBtn.classList.add('color-tab-disabled');
-      }
-      // forza il tab attivo su brush (default è bucket)
-      this.activeTab = 'brush';
-    }
-
     this._attachBucketHandler();
     this._attachBrushHandlers();
 
@@ -1110,7 +1096,7 @@ window.tools.color = {
     });
   },
 
-  /* -------- Secchiello: click su .colorable ---------- */
+  /* -------- Secchiello: click su .colorable o flood fill su pixel ---------- */
 
   _attachBucketHandler() {
     const cardCanvas = document.getElementById('card-canvas');
@@ -1121,19 +1107,198 @@ window.tools.color = {
     this._bucketClickHandler = (e) => {
       if (!this.active || this.activeTab !== 'bucket') return;
       const t = e.target;
+      // PRIMA: prova il path-fill SVG su .colorable (per template curati)
       let zone = null;
       if (t && t.classList && t.classList.contains('colorable')) {
         zone = t;
       } else if (t && typeof t.closest === 'function') {
         zone = t.closest('.colorable');
       }
-      if (!zone || !zone.id) return;
-      e.stopPropagation();
-      if (window.editor && typeof window.editor.colorZone === 'function') {
-        window.editor.colorZone(zone.id, window.APP_STATE.currentColor);
+      if (zone && zone.id) {
+        e.stopPropagation();
+        if (window.editor && typeof window.editor.colorZone === 'function') {
+          window.editor.colorZone(zone.id, window.APP_STATE.currentColor);
+        }
+        return;
       }
+
+      // ALTRIMENTI: flood-fill su pixel del brush canvas, usando il disegno
+      // sottostante come riferimento per i bordi. Limitato a 'coloring page'
+      // (modalità Colora) — per gli altri tipi (biglietto/invito/ecc.) un
+      // click fuori dalle .colorable non deve toccare lo sfondo.
+      const tpl = window.APP_STATE && window.APP_STATE.template;
+      if (!tpl || !tpl.isColoringPage) return;
+      const brushCanvas = document.getElementById('brush-canvas');
+      if (!brushCanvas || !brushCanvas.width || !brushCanvas.height) return;
+
+      e.stopPropagation();
+      const rect = brushCanvas.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width)  * brushCanvas.width;
+      const y = ((e.clientY - rect.top)  / rect.height) * brushCanvas.height;
+      const color = window.APP_STATE.currentColor || '#FF6B9D';
+      this.floodFill(x, y, color);
     };
     cardCanvas.addEventListener('click', this._bucketClickHandler);
+  },
+
+  /* -------- Flood fill su pixel del brush canvas ---------- */
+
+  /**
+   * Avvia un flood fill sul brush canvas da (x, y) (in pixel del canvas)
+   * col colore corrente. Registra l'operazione in APP_STATE.brushStrokes
+   * come { type:'fill', x:nx, y:ny, color } per undo/redo/redraw.
+   * @param {number} x  - pixel X relativo a brush-canvas
+   * @param {number} y  - pixel Y relativo a brush-canvas
+   * @param {string} color - colore CSS hex (#RRGGBB)
+   */
+  async floodFill(x, y, color) {
+    if (window.editor && typeof window.editor.saveSnapshot === 'function') {
+      window.editor.saveSnapshot();
+    }
+    const brushCanvas = document.getElementById('brush-canvas');
+    if (!brushCanvas) return;
+    const w = brushCanvas.width, h = brushCanvas.height;
+    const px = Math.floor(x), py = Math.floor(y);
+    if (px < 0 || px >= w || py < 0 || py >= h) return;
+
+    const ref = await this._ensureReferenceCanvas();
+    if (!ref) return;
+    this._doFloodFill(brushCanvas, ref, px, py, color);
+
+    // registra il fill nella history degli stroke per undo/resize/redraw
+    if (Array.isArray(window.APP_STATE.brushStrokes)) {
+      window.APP_STATE.brushStrokes.push({
+        type: 'fill',
+        x: px / w,
+        y: py / h,
+        color: color
+      });
+    }
+  },
+
+  /**
+   * Operazione raw di flood fill sul brush canvas, usando il reference
+   * canvas come mappa dei bordi. Non tocca state né history.
+   * Chiamata sia dal click utente (via floodFill) sia dal redraw post-undo
+   * (via editor._drawBrushStroke per fill type).
+   * @private
+   */
+  _doFloodFill(brushCanvas, refCanvas, px, py, color) {
+    const w = brushCanvas.width, h = brushCanvas.height;
+    if (refCanvas.width !== w || refCanvas.height !== h) return;
+
+    const refCtx = refCanvas.getContext('2d');
+    const refData = refCtx.getImageData(0, 0, w, h).data;
+    const brushCtx = brushCanvas.getContext('2d');
+    const brushImg = brushCtx.getImageData(0, 0, w, h);
+    const brushData = brushImg.data;
+
+    // se il pixel di partenza è un bordo scuro, non fare nulla
+    const startIdx = (py * w + px) * 4;
+    if (this._isBorder(refData, startIdx)) return;
+
+    const fill = this._parseColor(color);
+    const visited = new Uint8Array(w * h);
+    // stack-based BFS (evita overflow ricorsione su immagini grandi)
+    const stack = [px, py];
+    while (stack.length > 0) {
+      const cy = stack.pop();
+      const cx = stack.pop();
+      const ci = cy * w + cx;
+      if (visited[ci]) continue;
+      visited[ci] = 1;
+      const di = ci * 4;
+      if (this._isBorder(refData, di)) continue;
+      brushData[di]     = fill[0];
+      brushData[di + 1] = fill[1];
+      brushData[di + 2] = fill[2];
+      brushData[di + 3] = fill[3];
+      if (cx > 0)     stack.push(cx - 1, cy);
+      if (cx < w - 1) stack.push(cx + 1, cy);
+      if (cy > 0)     stack.push(cx, cy - 1);
+      if (cy < h - 1) stack.push(cx, cy + 1);
+    }
+    brushCtx.putImageData(brushImg, 0, 0);
+  },
+
+  /**
+   * True se il pixel (RGBA all'offset i di un'image data) è un "bordo":
+   * scuro abbastanza da fermare l'espansione del flood fill.
+   * @private
+   */
+  _isBorder(data, i) {
+    const a = data[i + 3];
+    if (a < 128) return false; // pixel trasparenti non sono bordi
+    const r = data[i], g = data[i + 1], b = data[i + 2];
+    const lum = (r * 299 + g * 587 + b * 114) / 1000;
+    return lum < 80;
+  },
+
+  /**
+   * Converte un colore hex (#RGB o #RRGGBB) in tupla [r, g, b, 255].
+   * @private
+   */
+  _parseColor(hex) {
+    let s = String(hex || '#FF6B9D').replace('#', '');
+    if (s.length === 3) s = s.split('').map(c => c + c).join('');
+    const r = parseInt(s.slice(0, 2), 16) || 0;
+    const g = parseInt(s.slice(2, 4), 16) || 0;
+    const b = parseInt(s.slice(4, 6), 16) || 0;
+    return [r, g, b, 255];
+  },
+
+  /**
+   * Renderizza il template corrente come bitmap su un canvas offscreen
+   * alle stesse dimensioni del brush canvas. Cache invalidata se le
+   * dimensioni cambiano. Chiamata anche all'apertura dell'editor in
+   * modalità coloring per pre-renderizzare (è async).
+   */
+  async _ensureReferenceCanvas() {
+    const brushCanvas = document.getElementById('brush-canvas');
+    if (!brushCanvas) return null;
+    const w = brushCanvas.width, h = brushCanvas.height;
+    if (!w || !h) return null;
+
+    const tpl = window.APP_STATE && window.APP_STATE.template;
+    const svgStr = tpl && tpl.svg;
+    const cacheKey = (svgStr || '') + '|' + w + 'x' + h;
+    if (this._refCanvas && this._refCacheKey === cacheKey) {
+      return this._refCanvas;
+    }
+
+    const ref = document.createElement('canvas');
+    ref.width = w;
+    ref.height = h;
+    const ctx = ref.getContext('2d');
+    // sfondo bianco (le aree fuori dal disegno non bloccano il fill)
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, w, h);
+
+    if (!svgStr) {
+      this._refCanvas = ref;
+      this._refCacheKey = cacheKey;
+      return ref;
+    }
+
+    return new Promise((resolve) => {
+      const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+      img.onload = () => {
+        try { ctx.drawImage(img, 0, 0, w, h); } catch (_) {}
+        URL.revokeObjectURL(url);
+        this._refCanvas = ref;
+        this._refCacheKey = cacheKey;
+        resolve(ref);
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        this._refCanvas = ref;
+        this._refCacheKey = cacheKey;
+        resolve(ref);
+      };
+      img.src = url;
+    });
   },
 
   /* -------- Pennello: mouse + touch sul brush-canvas ---------- */
