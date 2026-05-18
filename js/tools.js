@@ -1625,8 +1625,8 @@ window.tools.photo = {
     btn.dataset.tool = 'photo';
     btn.title = 'Carica una foto dal computer';
     btn.innerHTML =
-      '<span class="tool-btn-icon" aria-hidden="true">📷</span>' +
-      '<span class="tool-btn-label">Foto</span>';
+      '<span class="tool-btn-icon" aria-hidden="true">🖼️</span>' +
+      '<span class="tool-btn-label">Carica</span>';
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       this._openPicker();
