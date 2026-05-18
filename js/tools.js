@@ -220,11 +220,17 @@ window.tools.sticker = {
    ========================================================= */
 
 const TEXT_FONTS = [
-  { name: 'Baloo 2',      family: "'Baloo 2', sans-serif" },
-  { name: 'Pacifico',     family: "'Pacifico', cursive" },
-  { name: 'Fredoka One',  family: "'Fredoka One', cursive" },
-  { name: 'Patrick Hand', family: "'Patrick Hand', cursive" },
-  { name: 'Quicksand',    family: "'Quicksand', sans-serif" }
+  { name: 'Baloo 2',          family: "'Baloo 2', sans-serif" },
+  { name: 'Patrick Hand',     family: "'Patrick Hand', cursive" },
+  { name: 'Caveat',           family: "'Caveat', cursive" },
+  { name: 'Schoolbell',       family: "'Schoolbell', cursive" },
+  { name: 'Fredoka One',      family: "'Fredoka One', cursive" },
+  { name: 'Bangers',          family: "'Bangers', cursive" },
+  { name: 'Permanent Marker', family: "'Permanent Marker', cursive" },
+  { name: 'Pacifico',         family: "'Pacifico', cursive" },
+  { name: 'Princess Sofia',   family: "'Princess Sofia', cursive" },
+  { name: 'Sarina',           family: "'Sarina', cursive" },
+  { name: 'Quicksand',        family: "'Quicksand', sans-serif" }
 ];
 
 const TEXT_COLORS = [
