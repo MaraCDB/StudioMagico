@@ -207,7 +207,13 @@ window.editor = {
   init() {
     const state = window.APP_STATE;
     if (!state || !state.tipo || !state.template) {
-      console.warn('[editor] stato incompleto, impossibile avviare.');
+      // stato incompleto: in genere significa che il wizard è ancora su una
+      // step "vecchia" (es. step 3) dopo un reset di APP_STATE. Riporta
+      // l'utente a step 1 invece di restare bloccato su un bottone inerte.
+      console.warn('[editor] stato incompleto, riporto al wizard step 1.');
+      if (window.wizard && typeof window.wizard.goToStep === 'function') {
+        window.wizard.goToStep(1);
+      }
       return;
     }
 

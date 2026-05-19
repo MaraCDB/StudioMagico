@@ -673,13 +673,17 @@ function restartWizard() {
     testi: {},
     font: 'Baloo 2'
   };
+  // riporta anche la nav del wizard a step 1: lo state è azzerato, quindi
+  // se l'utente rientra nel wizard dal menu deve ripartire dal tipo, non
+  // ritrovarsi in step 3 con tipo/template null (in cui "Inizia a decorare"
+  // farebbe bail-out silenzioso in editor.init()).
+  goToStep(1);
   if (window.editor && typeof window.editor._showMenu === 'function') {
     window.editor._showMenu();
   } else {
     // fallback per sicurezza (non dovrebbe accadere a runtime)
     document.getElementById('editor').hidden = true;
     document.getElementById('wizard').hidden = false;
-    goToStep(1);
   }
 }
 
