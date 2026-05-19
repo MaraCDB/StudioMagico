@@ -388,7 +388,7 @@ async function renderScreenColora() {
 
     <div class="colora-upload-row">
       <input type="file" id="colora-file-input"
-             accept=".svg,.png,.jpg,.jpeg,.jfif,image/svg+xml,image/png,image/jpeg" hidden />
+             accept=".png,.jpg,.jpeg,.jfif,image/png,image/jpeg" hidden />
       <button type="button" class="btn btn-secondary" id="btn-colora-upload">
         📁 Carica dal computer
       </button>
@@ -523,85 +523,25 @@ function renderColoraGallery(drawings) {
   });
 }
 
-/**
- * Parsa una stringa SVG, estrae viewBox e orientamento,
- * marca l'elemento root con class="template-svg" pronto per l'editor.
- * @returns { svg: string, orientation: 'portrait'|'landscape', hasColorable: boolean } | null
- */
-function prepareColoringSvg(svgString) {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(svgString, 'image/svg+xml');
-  const parserError = doc.querySelector('parsererror');
-  if (parserError) return null;
-  const svg = doc.documentElement;
-  if (!svg || svg.tagName.toLowerCase() !== 'svg') return null;
-
-  const vb = svg.getAttribute('viewBox');
-  if (!vb) return null;
-  const parts = vb.trim().split(/\s+/).map(Number);
-  if (parts.length !== 4 || parts.some(n => !Number.isFinite(n))) return null;
-  const [, , w, h] = parts;
-  if (w <= 0 || h <= 0) return null;
-
-  svg.classList.add('template-svg');
-
-  const hasColorable = svg.querySelector('.colorable') !== null;
-  const orientation = w > h ? 'landscape' : 'portrait';
-  return {
-    svg: new XMLSerializer().serializeToString(svg),
-    orientation,
-    hasColorable
-  };
-}
-
 async function loadColoraDrawing(file) {
   if (!file) return;
-  const ext = (file.split('.').pop() || '').toLowerCase();
-
-  let res;
+  let blob;
   try {
-    res = await fetch('colouring_pages/' + file, { cache: 'no-store' });
+    const res = await fetch('colouring_pages/' + file, { cache: 'no-store' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
+    blob = await res.blob();
   } catch (err) {
     alert('Impossibile caricare il disegno: ' + err.message);
     return;
   }
-
   let prepared;
-  if (ext === 'svg') {
-    let svgText;
-    try {
-      svgText = await res.text();
-    } catch (err) {
-      alert('Impossibile leggere il disegno: ' + err.message);
-      return;
-    }
-    prepared = prepareColoringSvg(svgText);
-    if (!prepared) {
-      alert('Disegno non valido — assicurati che l\'SVG abbia un viewBox valido.');
-      return;
-    }
-  } else if (['png', 'jpg', 'jpeg', 'jfif'].includes(ext)) {
-    // raster dalla galleria: fetch come blob, wrap in SVG con <image dataURL>
-    let blob;
-    try {
-      blob = await res.blob();
-    } catch (err) {
-      alert('Impossibile leggere il disegno: ' + err.message);
-      return;
-    }
-    try {
-      // rasterFileToColoringSvg accetta qualunque Blob (File estende Blob)
-      prepared = await rasterFileToColoringSvg(blob);
-    } catch (err) {
-      alert('Impossibile caricare l\'immagine: ' + err.message);
-      return;
-    }
-  } else {
-    alert('Formato non supportato dalla galleria: ' + ext);
+  try {
+    // rasterFileToColoringSvg accetta qualunque Blob (File estende Blob)
+    prepared = await rasterFileToColoringSvg(blob);
+  } catch (err) {
+    alert('Impossibile caricare l\'immagine: ' + err.message);
     return;
   }
-
   openColoraEditor(prepared);
 }
 
@@ -623,7 +563,7 @@ function openColoraEditor(prepared) {
 }
 
 const MAX_UPLOAD_BYTES = 5 * 1024 * 1024; // 5 MB
-const ALLOWED_UPLOAD_EXTS = ['svg', 'png', 'jpg', 'jpeg', 'jfif'];
+const ALLOWED_UPLOAD_EXTS = ['png', 'jpg', 'jpeg', 'jfif'];
 
 async function handleColoraUpload(e) {
   const input = e.target;
@@ -638,32 +578,16 @@ async function handleColoraUpload(e) {
   }
   const ext = (file.name.split('.').pop() || '').toLowerCase();
   if (!ALLOWED_UPLOAD_EXTS.includes(ext)) {
-    alert('Formato non supportato. Usa SVG, PNG, JPG o JFIF.');
+    alert('Formato non supportato. Usa PNG, JPG o JFIF.');
     return;
   }
 
   let prepared;
-  if (ext === 'svg') {
-    let svgText;
-    try {
-      svgText = await file.text();
-    } catch (err) {
-      alert('Impossibile leggere il file: ' + err.message);
-      return;
-    }
-    prepared = prepareColoringSvg(svgText);
-    if (!prepared) {
-      alert('SVG non valido — assicurati che abbia un viewBox e nessun errore di sintassi.');
-      return;
-    }
-  } else {
-    // raster: leggo come dataURL e creo un SVG wrapper con viewBox = dimensione immagine
-    try {
-      prepared = await rasterFileToColoringSvg(file);
-    } catch (err) {
-      alert('Impossibile caricare l\'immagine: ' + err.message);
-      return;
-    }
+  try {
+    prepared = await rasterFileToColoringSvg(file);
+  } catch (err) {
+    alert('Impossibile caricare l\'immagine: ' + err.message);
+    return;
   }
   openColoraEditor(prepared);
 }

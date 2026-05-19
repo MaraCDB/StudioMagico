@@ -122,7 +122,7 @@ L'ordine nell'array `drawings` decide l'ordine nella galleria.
 1. La card della galleria mostra `thumbs/<nome>.png` come anteprima (caricata in lazy)
 2. Click sulla card → fetch del file principale, viene wrappato in un SVG dinamico con `<image href="data:...">` e usato come sfondo del canvas A4 dell'editor
 3. **Pennello**: dipinge sopra il disegno; grazie a `mix-blend-mode: multiply` i contorni neri restano sempre in primo piano sopra i colori
-4. **Secchiello**: clicca su una zona bianca → flood fill dal pixel cliccato espandendosi fino al primo bordo scuro, riempie l'area sul brush canvas col colore scelto. Funziona indipendentemente dalla struttura del file (raster o SVG single-path o SVG con `.colorable`).
+4. **Secchiello**: clicca su una zona bianca → flood fill dal pixel cliccato espandendosi fino al primo bordo scuro, riempie l'area sul brush canvas col colore scelto.
 5. **Stampa**: il canvas viene inviato alla stampante in formato A4 con orientamento corretto (portrait se H ≥ W, landscape altrimenti).
 
 ---
@@ -137,17 +137,3 @@ L'ordine nell'array `drawings` decide l'ordine nella galleria.
 | `thumbs/*.png` | Anteprime ≤ 240px usate nelle card della galleria |
 
 Niente da fare a mano in `thumbs/` — la cartella è gestita interamente dallo script.
-
----
-
-## SVG curati (modalità avanzata, opzionale)
-
-Se in futuro vuoi preparare SVG con regioni `.colorable` per avere bucket fill di "qualità vettoriale" su zone specifiche (più pulito del flood fill su pixel), l'app supporta ancora questa modalità per retrocompatibilità. Convenzione:
-
-- `viewBox` obbligatorio
-- Path delle regioni colorabili con `class="colorable"` e un id univoco
-- Contorni neri come path separati, scritti DOPO le regioni colorabili nel file (per stare sopra nello z-order)
-
-L'app dà la precedenza ai `.colorable` quando il click colpisce uno di questi path. Altrimenti, fallback automatico al flood fill su pixel.
-
-**Per la maggior parte dei casi non serve fare questa preparazione**: il flood fill su pixel funziona benissimo sulle immagini raster prese così come sono.
