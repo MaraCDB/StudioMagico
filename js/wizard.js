@@ -447,15 +447,29 @@ function renderColoraGallery(drawings) {
     </div>
   ` : '';
 
-  const cardsHtml = drawings.map((d, i) => `
-    <div class="colora-card"
-         data-file="${escapeHtml(d.file)}"
-         data-category="${escapeHtml(d.category || '')}"
-         role="button" tabindex="0">
-      <span class="colora-card-emoji">${escapeHtml(d.emoji || '🎨')}</span>
-      <span class="colora-card-name">${escapeHtml(d.name || d.file)}</span>
-    </div>
-  `).join('');
+  const cardsHtml = drawings.map((d) => {
+    // thumb in colouring_pages/thumbs/<basename>.png se file è PNG/JPG/JFIF;
+    // per SVG non c'è thumb generato (fallback all'emoji)
+    const ext = (d.file.split('.').pop() || '').toLowerCase();
+    const base = d.file.replace(/\.[^.]+$/, '');
+    const hasThumb = ['png', 'jpg', 'jpeg', 'jfif'].includes(ext);
+    const thumbUrl = hasThumb ? `colouring_pages/thumbs/${base}.png` : null;
+    const visual = thumbUrl
+      ? `<img class="colora-card-thumb" src="${escapeHtml(thumbUrl)}" alt="" loading="lazy" />`
+      : `<span class="colora-card-emoji">${escapeHtml(d.emoji || '🎨')}</span>`;
+    return `
+      <div class="colora-card"
+           data-file="${escapeHtml(d.file)}"
+           data-category="${escapeHtml(d.category || '')}"
+           role="button" tabindex="0">
+        ${visual}
+        <span class="colora-card-name">
+          <span class="colora-card-name-emoji" aria-hidden="true">${escapeHtml(d.emoji || '')}</span>
+          ${escapeHtml(d.name || d.file)}
+        </span>
+      </div>
+    `;
+  }).join('');
 
   gallery.innerHTML = `
     ${filtersHtml}

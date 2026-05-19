@@ -3178,10 +3178,32 @@ body.mode-my-tpls .step-bar {
   outline: none;
 }
 .colora-card-emoji { font-size: 42px; line-height: 1; }
+
+/* anteprima del disegno (raster) generata da scripts/optimize-coloring-pages.mjs */
+.colora-card-thumb {
+  display: block;
+  width: 100%;
+  max-width: 160px;
+  height: auto;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: #FFFFFF;
+  border: 1px solid #EFE5FB;
+}
+
 .colora-card-name {
   font: 600 14px 'Baloo 2', sans-serif;
   color: #2A2438;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.colora-card-name-emoji {
+  font-size: 16px;
+  line-height: 1;
 }
 
 .colora-upload-row {
