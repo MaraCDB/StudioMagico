@@ -3177,6 +3177,16 @@ body.mode-my-tpls .step-bar {
   box-shadow: 0 8px 20px rgba(199, 125, 255, 0.25);
   outline: none;
 }
+
+.colora-card.selected {
+  border-color: #FF6B9D;
+  background: linear-gradient(135deg, rgba(255, 107, 157, 0.08), rgba(199, 125, 255, 0.08));
+  box-shadow: 0 0 0 4px rgba(255, 107, 157, 0.2);
+  transform: translateY(-2px);
+}
+.colora-card.selected .colora-card-thumb {
+  border-color: #FF6B9D;
+}
 .colora-card-emoji { font-size: 42px; line-height: 1; }
 
 /* anteprima del disegno (raster) generata da scripts/optimize-coloring-pages.mjs */

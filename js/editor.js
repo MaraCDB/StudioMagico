@@ -280,11 +280,24 @@ window.editor = {
     else if (state.tipo === 'colora') editorMode = 'mode-editor-colora';
     document.body.classList.add(editorMode);
 
-    // 1. nascondi wizard, mostra editor
-    const wizard = document.getElementById('wizard');
-    const editorEl = document.getElementById('editor');
-    if (wizard) wizard.hidden = true;
-    if (editorEl) editorEl.hidden = false;
+    // 1. nascondi tutte le altre schermate, mostra editor
+    //    (l'editor è raggiungibile da wizard / screen-colora / screen-free /
+    //    riprendi bozza / i miei template — qualsiasi screen visibile prima
+    //    deve sparire altrimenti l'editor si apre "sotto")
+    const screenMenu    = document.getElementById('screen-menu');
+    const screenFree    = document.getElementById('screen-free');
+    const screenColora  = document.getElementById('screen-colora');
+    const screenMyTpl   = document.getElementById('screen-my-templates');
+    const screenDrafts  = document.getElementById('screen-drafts');
+    const wizard        = document.getElementById('wizard');
+    const editorEl      = document.getElementById('editor');
+    if (screenMenu)   screenMenu.hidden   = true;
+    if (screenFree)   screenFree.hidden   = true;
+    if (screenColora) screenColora.hidden = true;
+    if (screenMyTpl)  screenMyTpl.hidden  = true;
+    if (screenDrafts) screenDrafts.hidden = true;
+    if (wizard)       wizard.hidden       = true;
+    if (editorEl)     editorEl.hidden     = false;
 
     // 2. dimensione canvas: classe ratio-* per i 4 tipi standard,
     //    'colora' (A4) con orientamento variabile, 'libero' con misura custom

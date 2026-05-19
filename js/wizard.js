@@ -367,9 +367,15 @@ function renderStep3() {
 }
 
 /* ---------- SCHERMATA COLORA (entry-point dal menu home) ---------- */
+/* file attualmente selezionato dalla galleria — resettato a ogni renderScreenColora() */
+let _selectedColoraFile = null;
+
 async function renderScreenColora() {
   const root = document.getElementById('screen-colora');
   if (!root) return;
+
+  // reset: ogni volta che entriamo nella schermata, nessun disegno è selezionato
+  _selectedColoraFile = null;
 
   // markup iniziale (placeholder finché non carico il manifest)
   root.innerHTML = `
@@ -390,6 +396,7 @@ async function renderScreenColora() {
 
     <div class="nav-buttons">
       <button class="btn btn-secondary" id="btn-prev-colora">← Torna al menu</button>
+      <button class="btn btn-primary"   id="btn-next-colora" disabled>Avanti →</button>
     </div>
   `;
 
@@ -400,7 +407,14 @@ async function renderScreenColora() {
     }
   });
 
-  // upload (handler completo nel Task 9)
+  // Avanti: apre l'editor col disegno selezionato dalla galleria
+  root.querySelector('#btn-next-colora').addEventListener('click', () => {
+    if (_selectedColoraFile) {
+      loadColoraDrawing(_selectedColoraFile);
+    }
+  });
+
+  // upload da PC: apre l'editor direttamente (passa per il file picker)
   const fileInput = root.querySelector('#colora-file-input');
   const btnUpload = root.querySelector('#btn-colora-upload');
   btnUpload.addEventListener('click', () => fileInput.click());
@@ -488,12 +502,23 @@ function renderColoraGallery(drawings) {
     });
   });
 
-  // click su una card: carica il disegno (handler completo nel Task 7)
+  // click su una card: seleziona il disegno (l'editor si apre col bottone Avanti).
+  // Doppio click → seleziona + apre direttamente, comodo per chi sa già cosa vuole.
   gallery.querySelectorAll('.colora-card').forEach(card => {
-    const open = () => loadColoraDrawing(card.dataset.file);
-    card.addEventListener('click', open);
+    const select = () => {
+      gallery.querySelectorAll('.colora-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      _selectedColoraFile = card.dataset.file;
+      const nextBtn = document.getElementById('btn-next-colora');
+      if (nextBtn) nextBtn.disabled = false;
+    };
+    card.addEventListener('click', select);
+    card.addEventListener('dblclick', () => {
+      select();
+      loadColoraDrawing(card.dataset.file);
+    });
     card.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(); }
     });
   });
 }
