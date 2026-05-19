@@ -3255,6 +3255,26 @@ window.editor = {
     });
   },
 
+  /**
+   * Il logo "Studio Magico" in header funziona come bottone Home universale:
+   * click / Enter / Spazio → torna al menu principale da qualunque schermata
+   * (editor incluso). Non resetta APP_STATE: l'utente che vuole svuotare
+   * tutto usa "← Ricomincia" nell'editor. Idempotente.
+   */
+  _setupHeaderLogo() {
+    const logo = document.getElementById('header-logo');
+    if (!logo || logo._homeWired) return;
+    logo._homeWired = true;
+    const goHome = () => this._showMenu();
+    logo.addEventListener('click', goHome);
+    logo.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        goHome();
+      }
+    });
+  },
+
   /* =====================================================
      SALVA COME TEMPLATE — modal, anteprima, persistenza
      ===================================================== */
@@ -3962,6 +3982,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.editor._setupMenuScreen();
   window.editor._setupFreeScreen();
   window.editor._setupRestartToMenu();
+  window.editor._setupHeaderLogo();
   window.editor._setupToolPanelPositioning();
   window.editor._setupSaveTemplateModal();
   window.editor._setupSaveDraftModal();
