@@ -1,141 +1,153 @@
 # 🎨 Cartella `colouring_pages/`
 
-Questa cartella contiene i disegni da colorare che appaiono nella galleria della sezione **Colora** del wizard di Studio Magico.
-
-## Come aggiungere un nuovo disegno
-
-1. **Prepara il file SVG** seguendo le regole sotto
-2. **Copialo dentro questa cartella** (`colouring_pages/`)
-3. **Aggiungilo a `index.json`** (il manifest che l'app legge per popolare la galleria)
-4. Apri Studio Magico → Crea con wizard → Colora: il disegno appare nella galleria
-
-Niente compilazione, niente riavvio del server. Basta ricaricare la pagina del browser.
+Qui dentro vivono i disegni da colorare che appaiono nella galleria della sezione **Colora** sul menu home di Studio Magico.
 
 ---
 
-## Regole per i file SVG
+## Workflow rapido per aggiungere disegni
 
-### Solo SVG
+In ordine, ogni volta che hai nuove immagini da mettere in galleria:
 
-L'app accetta solo file `.svg` in questa cartella. PNG, JPG e altri formati raster **non funzionano** dalla cartella interna (l'utente finale può comunque caricarli da PC, ma in quel caso sarà disponibile solo il pennello, non il secchiello).
+1. **Trascina i file** (PNG / JPG / JFIF) dentro questa cartella, al livello principale (NON in sottocartelle).
+2. **Apri `index.json`** e aggiungi una riga per ognuno (vedi sotto la sezione dedicata).
+3. **Lancia lo script di ottimizzazione** dal terminale, dalla root del progetto:
+   ```bash
+   node scripts/optimize-coloring-pages.mjs
+   ```
+4. **`git add` + commit + push** (Netlify ridepoloya automaticamente).
+5. Apri Studio Magico → 🎨 Colora: i nuovi disegni sono in galleria.
 
-Se hai un'immagine raster da convertire, usa offline strumenti tipo **Inkscape** (`Tracciato → Vettorizza bitmap`) o servizi tipo **vectormagic.com**, poi rifinisci a mano in Inkscape per assicurarti che le regioni colorabili siano path chiusi.
+---
 
-### Struttura del file
+## Lo script di ottimizzazione
 
-Apri il file SVG con un editor di testo. Deve avere questa forma:
+Lo script `scripts/optimize-coloring-pages.mjs` è quello che fa la magia. Per ogni immagine al livello principale di questa cartella:
 
-```xml
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
-  <!-- 1) REGIONI COLORABILI (scritte PRIMA, stanno sotto) -->
-  <path class="colorable" fill="#FFFFFF" d="M ..." />
-  <path class="colorable" fill="#FFFFFF" d="M ..." />
-  <path class="colorable" fill="#FFFFFF" d="M ..." />
+- **Ridimensiona** il lato lungo a max **1754px** (= A4 a ~150 DPI, qualità di stampa più che decente)
+- **Riconverte tutto in PNG** con palette quantizzata (formato perfetto per i contorni neri dei coloring → niente sbavature JPEG che farebbero "colare" il secchiello tra le zone)
+- **Elimina il file originale** se aveva un'estensione diversa (es. `.jfif` → diventa `.png`, l'originale viene cancellato)
+- **Genera l'anteprima** (≤ 240px sul lato lungo) dentro `thumbs/<nomefile>.png` — è quella che vedi nella card della galleria
+- Stampa un report con i risparmi ottenuti
 
-  <!-- 2) CONTORNI NERI (scritti DOPO, stanno sopra) -->
-  <path fill="none" stroke="#000000" stroke-width="3" d="M ..." />
-  <path fill="none" stroke="#000000" stroke-width="3" d="M ..." />
-</svg>
+### Setup iniziale (una volta sola)
+
+Lo script usa la libreria **sharp** (Node.js). Per installarla la prima volta:
+
+```bash
+cd scripts
+npm install sharp
+cd ..
 ```
 
-### Cosa è obbligatorio
+`scripts/node_modules/` è nel `.gitignore`, quindi non finisce mai su GitHub.
 
-| Cosa | Perché |
-|---|---|
-| Attributo `viewBox="0 0 W H"` sul `<svg>` | Definisce l'area del disegno. L'app deduce l'**orientamento A4** dal rapporto W/H:<br>• `W > H` → A4 **orizzontale** (1123×794 px)<br>• `H ≥ W` → A4 **verticale** (794×1123 px) |
-| Path delle regioni con `class="colorable"` e `fill="#FFFFFF"` | Su questi path il **secchiello** colora con un click |
-| Path dei contorni con `fill="none"` e `stroke="#000000"` (o vicino al nero) | Sono le linee del disegno, **non vanno colorate**. Niente `class="colorable"` su di loro |
-| Contorni scritti **dopo** le regioni colorabili nel file | Nello z-order SVG, gli elementi scritti dopo stanno sopra. Così il contorno nero appare sopra il riempimento |
-| Niente JavaScript embedded, niente riferimenti esterni (font, immagini incorporate) | Sicurezza e portabilità |
+### Esecuzione
 
-### Convenzione di naming
+Dalla cartella root del progetto:
 
-- Tutto minuscolo
-- Senza accenti
-- Parole separate da trattino
+```bash
+node scripts/optimize-coloring-pages.mjs
+```
 
-Esempi: `gatto-spaziale.svg`, `castello.svg`, `palloncini.svg`
+Esempio di output:
+```
+gatto.png                      2000×2000   129 KB →   44 KB  (thumb 6 KB)
+cane_passeggiata.png           1408×768   1866 KB →  388 KB  (thumb 14 KB)
+torta2.png                      864×1232  1193 KB →  251 KB  (thumb 15 KB)
+...
+Processati 16 file
+Totale prima:  4.71 MB
+Totale dopo:   2.34 MB
+Risparmio:     50%
+```
+
+Idempotente: rilanciarlo su file già ottimizzati non rompe niente (semplicemente non risparmia nulla).
 
 ---
 
-## Il manifest `index.json`
+## `index.json` — il manifest della galleria
 
-L'app **non legge automaticamente** il contenuto della cartella (i browser non possono elencare directory locali). Per questo c'è un file `index.json` che elenca i disegni disponibili.
+L'app NON legge automaticamente il contenuto della cartella (i browser non possono elencare le directory locali per sicurezza). Per questo c'è il file `index.json` che elenca cosa mostrare nella galleria.
 
 ### Struttura
 
 ```json
 {
   "drawings": [
-    { "file": "palloncini.svg",   "name": "Palloncini",   "category": "festa",    "emoji": "🎈" },
-    { "file": "torta.svg",        "name": "Torta",        "category": "festa",    "emoji": "🎂" },
-    { "file": "unicorno.svg",     "name": "Unicorno",     "category": "fantasia", "emoji": "🦄" }
+    { "file": "gatto.png",      "name": "Gatto",      "category": "animali", "emoji": "🐱" },
+    { "file": "torta.png",      "name": "Torta",      "category": "festa",   "emoji": "🎂" },
+    { "file": "arcobaleno.png", "name": "Arcobaleno", "category": "fantasia","emoji": "🌈" }
   ]
 }
 ```
 
-### Campi per ogni disegno
+### Campi
 
 | Campo | Obbligatorio | Cosa è |
 |---|---|---|
-| `file` | sì | Nome del file SVG dentro questa cartella (es: `"palloncini.svg"`) |
-| `name` | sì | Nome mostrato sotto l'anteprima nella galleria (es: `"Palloncini"`) |
-| `category` | sì | Categoria per i filtri. Valori previsti: `festa`, `animali`, `fantasia`, `natura`, `veicoli`. Se ne aggiungi di nuove, l'app le mostra come filtri |
-| `emoji` | no | Emoji decorativa accanto al nome (es: `"🎈"`) |
+| `file` | sì | Nome del file con estensione (es: `"gatto.png"`). Sempre `.png` dopo aver passato lo script di ottimizzazione |
+| `name` | sì | Nome mostrato sotto l'anteprima nella galleria (es: `"Gatto"`) |
+| `category` | sì | Categoria per i filtri. Valori previsti: `animali`, `festa`, `fantasia`, `natura`, `veicoli`. Se ne aggiungi una nuova compare automaticamente come filtro |
+| `emoji` | no | Emoji decorativa accanto al nome. Se manca, viene usata 🎨 di default |
 
 ### Aggiungere un nuovo disegno
 
-1. Copia il file SVG in questa cartella (es: `gatto-spaziale.svg`)
+1. Copia il file (es: `gatto-spaziale.png`) in `colouring_pages/`
 2. Apri `index.json` e aggiungi una riga nell'array `drawings`:
 
-```json
-{ "file": "gatto-spaziale.svg", "name": "Gatto spaziale", "category": "fantasia", "emoji": "🐱" }
-```
+   ```json
+   { "file": "gatto-spaziale.png", "name": "Gatto spaziale", "category": "fantasia", "emoji": "🐱" }
+   ```
 
-3. Ricorda la **virgola** tra una riga e l'altra, ma **niente virgola** dopo l'ultima riga (è un JSON, non un JavaScript array)
-4. Ricarica Studio Magico nel browser
+3. **Virgola** tra una riga e l'altra, **niente virgola** dopo l'ultima (è JSON, non JS).
+4. Lancia lo script di ottimizzazione (vedi sopra).
+5. Commit + push.
 
----
-
-## Esempio minimo completo
-
-File `cuore.svg`:
-
-```xml
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-  <path class="colorable" fill="#FFFFFF"
-        d="M100,170 C40,120 20,80 50,50 C70,30 95,40 100,70 C105,40 130,30 150,50 C180,80 160,120 100,170 Z" />
-  <path fill="none" stroke="#000000" stroke-width="3"
-        d="M100,170 C40,120 20,80 50,50 C70,30 95,40 100,70 C105,40 130,30 150,50 C180,80 160,120 100,170 Z" />
-</svg>
-```
-
-Riga corrispondente in `index.json`:
-
-```json
-{ "file": "cuore.svg", "name": "Cuore", "category": "festa", "emoji": "❤️" }
-```
-
-Risultato:
-- La galleria mostra una card "❤️ Cuore" nella categoria Festa
-- Il disegno è 200×200 (quadrato), `H ≥ W` → l'editor apre in A4 **verticale**
-- Click sul cuore col secchiello → si riempie del colore scelto, il bordo nero resta visibile
+L'ordine nell'array `drawings` decide l'ordine nella galleria.
 
 ---
 
-## Domande frequenti
+## Convenzioni per i file sorgente
 
-**Il mio disegno ha più colori già, non solo bianco. Funziona?**
-Sì, ma le aree pre-colorate non sono `.colorable` → il secchiello non le tocca. Puoi sempre dipingerci sopra col pennello.
+- **Cosa funziona meglio**: line-art nero su sfondo bianco (i classici disegni da colorare), con linee chiuse e contrasto alto. Il secchiello (flood fill) si ferma sui pixel scuri (luminanza < 80/255).
+- **Cosa non funziona**: foto a colori, disegni con tante sfumature di grigio (il secchiello potrebbe "colare" attraverso i bordi sfumati), immagini con sfondi non bianchi.
+- **Naming**: tutto minuscolo, senza accenti, parole separate da trattino o underscore (`gatto_casa.png`, `cane-al-parco.png`). Niente spazi.
+- **Dimensioni di partenza**: qualunque, lo script ridimensiona a A4. Idealmente le immagini sorgente sono già ≥ 1200px sul lato lungo, così la riduzione mantiene buona qualità.
+- **Formato di partenza**: PNG/JPG/JFIF — tutti vengono comunque convertiti in PNG ottimizzato dallo script.
 
-**Il secchiello mi colora anche le linee nere — perché?**
-Hai messo `class="colorable"` su un path che è un contorno. Toglilo. Solo le regioni interne devono avere `class="colorable"`.
+---
 
-**Posso usare colori diversi dal nero per i contorni?**
-Sì, qualsiasi colore. L'app non li tratta diversamente — semplicemente non hanno `class="colorable"` quindi il secchiello non li tocca.
+## Cosa fa l'app col file in runtime
 
-**Le proporzioni del mio disegno non sono A4. Si stiracchia?**
-No. L'app fa **fit** mantenendo le proporzioni (`preserveAspectRatio="xMidYMid meet"`). Se l'aspect ratio è diverso da A4, vedrai bande bianche ai lati. Per stampe pulite, prepara disegni con aspect ratio 210:297 (verticale) o 297:210 (orizzontale).
+1. La card della galleria mostra `thumbs/<nome>.png` come anteprima (caricata in lazy)
+2. Click sulla card → fetch del file principale, viene wrappato in un SVG dinamico con `<image href="data:...">` e usato come sfondo del canvas A4 dell'editor
+3. **Pennello**: dipinge sopra il disegno; grazie a `mix-blend-mode: multiply` i contorni neri restano sempre in primo piano sopra i colori
+4. **Secchiello**: clicca su una zona bianca → flood fill dal pixel cliccato espandendosi fino al primo bordo scuro, riempie l'area sul brush canvas col colore scelto. Funziona indipendentemente dalla struttura del file (raster o SVG single-path o SVG con `.colorable`).
+5. **Stampa**: il canvas viene inviato alla stampante in formato A4 con orientamento corretto (portrait se H ≥ W, landscape altrimenti).
 
-**Posso aggiungere font o immagini esterne nell'SVG?**
-No, per sicurezza. Converti tutto il testo in path (in Inkscape: `Tracciato → Da oggetto a tracciato`) e incorpora le immagini come `<image>` con `data:` URL solo se proprio necessario.
+---
+
+## File e cartelle qui dentro
+
+| Path | Cosa è |
+|---|---|
+| `README.md` | Questo file |
+| `index.json` | Manifest della galleria (vedi sopra) |
+| `*.png` al livello root | I disegni a piena risoluzione (A4 @ 150 DPI) |
+| `thumbs/*.png` | Anteprime ≤ 240px usate nelle card della galleria |
+
+Niente da fare a mano in `thumbs/` — la cartella è gestita interamente dallo script.
+
+---
+
+## SVG curati (modalità avanzata, opzionale)
+
+Se in futuro vuoi preparare SVG con regioni `.colorable` per avere bucket fill di "qualità vettoriale" su zone specifiche (più pulito del flood fill su pixel), l'app supporta ancora questa modalità per retrocompatibilità. Convenzione:
+
+- `viewBox` obbligatorio
+- Path delle regioni colorabili con `class="colorable"` e un id univoco
+- Contorni neri come path separati, scritti DOPO le regioni colorabili nel file (per stare sopra nello z-order)
+
+L'app dà la precedenza ai `.colorable` quando il click colpisce uno di questi path. Altrimenti, fallback automatico al flood fill su pixel.
+
+**Per la maggior parte dei casi non serve fare questa preparazione**: il flood fill su pixel funziona benissimo sulle immagini raster prese così come sono.
