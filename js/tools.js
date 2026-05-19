@@ -1280,8 +1280,17 @@ window.tools.color = {
       return ref;
     }
 
+    // Forziamo width/height espliciti sull'SVG matching le dimensioni del
+    // brush canvas. Senza questo, il browser renderizza l'SVG ad una taglia
+    // arbitraria (default 300x150 o viewBox) e poi drawImage lo stira a w×h
+    // IGNORANDO il preserveAspectRatio dell'SVG — risultato: la reference è
+    // distorta, mentre l'SVG visibile sullo schermo (che ha width/height 100%
+    // del card-canvas) usa preserveAspectRatio correttamente con letterbox.
+    // Mismatch → click misallineati al disegno.
+    const sized = this._svgWithSize(svgStr, w, h);
+
     return new Promise((resolve) => {
-      const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+      const blob = new Blob([sized], { type: 'image/svg+xml;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const img = new Image();
       img.onload = () => {
@@ -1299,6 +1308,30 @@ window.tools.color = {
       };
       img.src = url;
     });
+  },
+
+  /**
+   * Ritorna l'SVG con width="w" height="h" espliciti, e
+   * preserveAspectRatio="xMidYMid meet" se mancante. Così la bitmap
+   * renderizzata dal browser combacia esattamente con quella mostrata
+   * a schermo nel card-canvas.
+   * @private
+   */
+  _svgWithSize(svgStr, w, h) {
+    try {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(svgStr, 'image/svg+xml');
+      const svg = doc.documentElement;
+      if (svg && svg.tagName.toLowerCase() === 'svg') {
+        svg.setAttribute('width',  String(w));
+        svg.setAttribute('height', String(h));
+        if (!svg.getAttribute('preserveAspectRatio')) {
+          svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+        }
+        return new XMLSerializer().serializeToString(svg);
+      }
+    } catch (_) { /* fallback */ }
+    return svgStr;
   },
 
   /* -------- Pennello: mouse + touch sul brush-canvas ---------- */
