@@ -3187,6 +3187,13 @@ body.mode-my-tpls .step-bar {
 .colora-card.selected .colora-card-thumb {
   border-color: #FF6B9D;
 }
+
+/* override del display:flex sopra: senza questo il browser ignora l'attributo
+   [hidden] (specificità della regola UA-default più bassa della nostra) e
+   il filtro categoria non nasconderebbe nulla */
+.colora-card[hidden] {
+  display: none;
+}
 .colora-card-emoji { font-size: 42px; line-height: 1; }
 
 /* anteprima del disegno (raster) generata da scripts/optimize-coloring-pages.mjs */
