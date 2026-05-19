@@ -3324,3 +3324,161 @@ body.printing .photo-rotate-handle,
 body.printing .photo-delete-btn { display: none !important; }
 body.printing .photo-el.selected { outline: none; }
 body.printing .photo-el img { box-shadow: none; }
+
+/* ===== FORME — elementi geometrici colorabili sul canvas ===== */
+.shape-el {
+  /* left/top puntano al CENTRO (translate(-50%,-50%) nello style inline) */
+  /* width in %, aspect 1:1 → height segue */
+  z-index: 4;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+.shape-el:active { cursor: grabbing; }
+.shape-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;       /* il click va al contenitore, il path eredita pointer-events */
+}
+/* il path interno è cliccabile (per il bucket); il bucket-tab-active sul
+   card-canvas dà il cursor pointer come per le altre .colorable */
+.shape-svg .colorable {
+  pointer-events: auto;
+}
+/* maniglie/bottoni nascosti finché non selezionata */
+.shape-handle,
+.shape-rotate-handle,
+.shape-delete-btn {
+  display: none;
+}
+.shape-el.selected {
+  outline: 2px dashed rgba(199, 125, 255, 0.85);
+  outline-offset: 6px;
+}
+.shape-el.selected .shape-handle,
+.shape-el.selected .shape-rotate-handle,
+.shape-el.selected .shape-delete-btn {
+  display: block;
+}
+
+/* Maniglie di resize agli angoli */
+.shape-handle {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: #FFFFFF;
+  border: 2px solid #C77DFF;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+  z-index: 6;
+}
+.shape-handle-tl { top: -9px;    left: -9px;   cursor: nwse-resize; }
+.shape-handle-tr { top: -9px;    right: -9px;  cursor: nesw-resize; }
+.shape-handle-bl { bottom: -9px; left: -9px;   cursor: nesw-resize; }
+.shape-handle-br { bottom: -9px; right: -9px;  cursor: nwse-resize; }
+
+/* Maniglia di rotazione sopra la forma */
+.shape-rotate-handle {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 26px;
+  height: 26px;
+  background: linear-gradient(135deg, #FF6B9D, #C77DFF);
+  color: #FFFFFF;
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 26px;
+  cursor: grab;
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.28);
+  z-index: 6;
+  user-select: none;
+}
+.shape-rotate-handle:active { cursor: grabbing; }
+
+/* Bottone elimina in alto a destra */
+.shape-delete-btn {
+  position: absolute;
+  top: -13px;
+  right: -13px;
+  width: 24px;
+  height: 24px;
+  background: #FF5252;
+  color: #FFFFFF;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 22px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.28);
+  z-index: 7;
+}
+.shape-delete-btn:hover {
+  background: #D32F2F;
+  transform: scale(1.1);
+}
+
+/* In stampa: nascondi maniglie e selezione */
+body.printing .shape-handle,
+body.printing .shape-rotate-handle,
+body.printing .shape-delete-btn { display: none !important; }
+body.printing .shape-el.selected { outline: none; }
+
+/* ===== Pannello tool Forme (toolbar 💠) ===== */
+#panel-shape {
+  background: #FFFFFF;
+  border: 3px solid #E0CFF7;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  max-width: 360px;
+}
+.shape-panel-title {
+  font: 700 14px 'Baloo 2', sans-serif;
+  color: #6c5b8a;
+  margin-bottom: 10px;
+}
+.shape-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+.shape-pick {
+  background: #FFF8F0;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  padding: 6px;
+  cursor: pointer;
+  aspect-ratio: 1 / 1;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.shape-pick:hover {
+  background: #FFF;
+  border-color: #C77DFF;
+  transform: scale(1.08);
+}
+.shape-pick svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@media (max-width: 600px) {
+  #panel-shape {
+    width: calc(100vw - 36px);
+    max-width: 320px;
+  }
+  .shape-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

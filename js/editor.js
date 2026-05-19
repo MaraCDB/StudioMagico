@@ -3,6 +3,36 @@
    ======================================================= */
 
 /**
+ * Catalogo delle forme inseribili dal tool 💠 Forme.
+ * Ogni voce: viewBox (sempre 100x100 per uniformità del rendering) e d= di un
+ * path che racchiude la forma. All'inserimento il path riceve class="colorable"
+ * + fill="white" + stroke="#2A2438" così il secchiello può colorarlo via il
+ * fast-path .colorable esistente in tools.color.
+ */
+const SHAPES = {
+  cerchio:    { label: 'Cerchio',    path: 'M50,5 a45,45 0 1,0 0,90 a45,45 0 1,0 0,-90 Z' },
+  quadrato:   { label: 'Quadrato',   path: 'M10,10 H90 V90 H10 Z' },
+  rettangolo: { label: 'Rettangolo', path: 'M5,30 H95 V70 H5 Z' },
+  triangolo:  { label: 'Triangolo',  path: 'M50,10 L90,85 L10,85 Z' },
+  ovale:      { label: 'Ovale',      path: 'M50,20 a40,30 0 1,0 0,60 a40,30 0 1,0 0,-60 Z' },
+  rombo:      { label: 'Rombo',      path: 'M50,5 L95,50 L50,95 L5,50 Z' },
+  pentagono:  { label: 'Pentagono',  path: 'M50,8 L92,38 L76,88 L24,88 L8,38 Z' },
+  esagono:    { label: 'Esagono',    path: 'M50,8 L88,28 L88,72 L50,92 L12,72 L12,28 Z' },
+  ottagono:   { label: 'Ottagono',   path: 'M30,8 H70 L92,30 V70 L70,92 H30 L8,70 V30 Z' },
+  cuore:      { label: 'Cuore',      path: 'M50,85 C20,65 5,45 18,28 C28,15 45,18 50,32 C55,18 72,15 82,28 C95,45 80,65 50,85 Z' },
+  stella:     { label: 'Stella',     path: 'M50,8 L61,38 L93,38 L67,57 L77,88 L50,69 L23,88 L33,57 L7,38 L39,38 Z' },
+  stellina4:  { label: 'Stellina',   path: 'M50,10 L58,42 L90,50 L58,58 L50,90 L42,58 L10,50 L42,42 Z' },
+  fiore:      { label: 'Fiore',      path: 'M50,15 C58,5 75,12 70,28 C85,22 90,40 75,46 C90,52 85,70 70,64 C75,80 58,87 50,77 C42,87 25,80 30,64 C15,70 10,52 25,46 C10,40 15,22 30,28 C25,12 42,5 50,15 Z M50,40 a8,8 0 1,0 0,16 a8,8 0 1,0 0,-16 Z' },
+  sole:       { label: 'Sole',       path: 'M50,30 a20,20 0 1,0 0,40 a20,20 0 1,0 0,-40 Z M50,5 L52,18 H48 Z M50,82 L52,95 H48 Z M5,50 L18,52 V48 Z M82,50 L95,52 V48 Z M18,18 L28,26 L26,28 Z M72,72 L82,82 L80,74 Z M82,18 L72,28 L74,26 Z M18,82 L28,72 L26,74 Z' },
+  nuvola:     { label: 'Nuvola',     path: 'M25,70 C10,70 8,55 22,52 C20,38 38,32 45,42 C50,32 70,32 72,46 C88,46 90,68 75,70 Z' },
+  luna:       { label: 'Luna',       path: 'M65,15 C40,15 22,35 22,55 C22,75 40,90 65,90 C50,82 42,70 42,52 C42,34 50,22 65,15 Z' },
+  fulmine:    { label: 'Fulmine',    path: 'M55,5 L25,50 L45,52 L35,95 L75,40 L52,38 Z' },
+  goccia:     { label: 'Goccia',     path: 'M50,8 C32,38 22,55 22,70 C22,85 35,95 50,95 C65,95 78,85 78,70 C78,55 68,38 50,8 Z' },
+  freccia:    { label: 'Freccia',    path: 'M50,8 L80,38 H62 V92 H38 V38 H20 Z' },
+  spunta:     { label: 'Spunta',     path: 'M15,50 L40,75 L88,22 L78,12 L40,55 L25,40 Z' }
+};
+
+/**
  * Layout di testo per ciascun tipo di creazione.
  * Ogni voce descrive dove e come posizionare un campo
  * compilato nello step 3 all'interno del canvas.
@@ -166,6 +196,10 @@ const TEXT_LAYOUTS = {
 };
 
 window.editor = {
+  // catalogo forme esposto per il pannello tools.shape (legge da qui per
+  // costruire i preview del pannello)
+  _SHAPES: SHAPES,
+
   /**
    * Avvia l'editor: nasconde il wizard, mostra il canvas
    * con il template scelto e i testi inseriti.
@@ -212,6 +246,12 @@ window.editor = {
     }
     state.selectedPhotoId = null;
 
+    // assicura che lo stato delle forme esista
+    if (!Array.isArray(state.shapes)) {
+      state.shapes = [];
+    }
+    state.selectedShapeId = null;
+
     // assicura che lo stato di colore/pennello esista
     if (!state.coloredZones || typeof state.coloredZones !== 'object') {
       state.coloredZones = {};
@@ -248,10 +288,12 @@ window.editor = {
       state.tapes        = JSON.parse(JSON.stringify(snap.tapes        || []));
       state.coloredZones = JSON.parse(JSON.stringify(snap.coloredZones || {}));
       state.photos       = JSON.parse(JSON.stringify(snap.photos       || []));
+      state.shapes       = JSON.parse(JSON.stringify(snap.shapes       || []));
       state.testi = {};
       state.selectedTextId = null;
       state.tapeInProgress = null;
       state.selectedPhotoId = null;
+      state.selectedShapeId = null;
     }
     // consuma il flag (non deve persistere oltre questa init)
     delete state._restoredFromDraft;
@@ -346,6 +388,9 @@ window.editor = {
     // 7-bis. renderizza le foto caricate dall'utente
     this.renderPhotos();
 
+    // 7-ter. renderizza le forme geometriche inserite dall'utente
+    this.renderShapes();
+
     // 8. (rimosso) forme colorabili di test — ora vengono dal template SVG
 
     // 9. riapplica i colori salvati alle zone colorabili
@@ -378,6 +423,9 @@ window.editor = {
     }
     if (window.tools && window.tools.photo && typeof window.tools.photo.init === 'function') {
       window.tools.photo.init();
+    }
+    if (window.tools && window.tools.shape && typeof window.tools.shape.init === 'function') {
+      window.tools.shape.init();
     }
     if (window.tools && window.tools.background && typeof window.tools.background.init === 'function') {
       window.tools.background.init();
@@ -1111,6 +1159,280 @@ window.editor = {
   },
 
   /* =====================================================
+     FORME — geometriche, inseribili dal pannello, drag +
+     resize + rotate + delete + coloring tramite secchiello
+     ===================================================== */
+
+  /**
+   * Aggiunge una forma al canvas e allo stato. Chiamata da tools.js
+   * quando l'utente clicca una forma nel pannello 💠.
+   * @param {string} shapeKey id della forma in SHAPES (es: 'cerchio')
+   */
+  addShape(shapeKey) {
+    if (!SHAPES[shapeKey]) return;
+    this.saveSnapshot();
+    if (!Array.isArray(window.APP_STATE.shapes)) {
+      window.APP_STATE.shapes = [];
+    }
+    const id = 'sh_' + Date.now().toString(36) + '_' +
+               Math.random().toString(36).slice(2, 7);
+    const data = {
+      id,
+      shape: shapeKey,
+      xPct: 50,        // centro x in % del canvas
+      yPct: 50,        // centro y
+      widthPct: 20,    // larghezza in % del canvas
+      rotation: 0
+    };
+    window.APP_STATE.shapes.push(data);
+    this._createShapeEl(data);
+    this._selectShape(id);
+  },
+
+  /** Ricrea tutti gli .shape-el dal DOM in base a APP_STATE.shapes. */
+  renderShapes() {
+    const canvas = document.getElementById('card-canvas');
+    if (!canvas) return;
+    canvas.querySelectorAll('.shape-el').forEach(el => el.remove());
+    const list = Array.isArray(window.APP_STATE.shapes)
+      ? window.APP_STATE.shapes : [];
+    list.forEach(data => this._createShapeEl(data));
+    // riapplica i colori salvati alle nuove forme (i loro id sono in coloredZones)
+    this.applyColoredZones();
+  },
+
+  /**
+   * Costruisce il div .shape-el (un wrapper posizionato) contenente un SVG
+   * con il path .colorable della forma + le maniglie di resize/rotate +
+   * bottone elimina.
+   * @private
+   */
+  _createShapeEl(data) {
+    const canvas = document.getElementById('card-canvas');
+    if (!canvas) return null;
+    const spec = SHAPES[data.shape];
+    if (!spec) return null;
+
+    const el = document.createElement('div');
+    el.className = 'shape-el';
+    el.dataset.id = data.id;
+    this._applyShapeStyle(el, data);
+
+    // SVG con il path .colorable. L'id sul path è quello che coloredZones
+    // userà, così salva-bozza/template/undo del color tool funzionano subito.
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('viewBox', '0 0 100 100');
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    svg.classList.add('shape-svg');
+    const path = document.createElementNS(svgNS, 'path');
+    path.setAttribute('d', spec.path);
+    path.setAttribute('fill', '#FFFFFF');
+    path.setAttribute('stroke', '#2A2438');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('stroke-linejoin', 'round');
+    path.setAttribute('vector-effect', 'non-scaling-stroke');
+    path.classList.add('colorable');
+    path.id = data.id;
+    svg.appendChild(path);
+    el.appendChild(svg);
+
+    // maniglie agli angoli (resize)
+    ['tl', 'tr', 'bl', 'br'].forEach(pos => {
+      const h = document.createElement('div');
+      h.className = 'shape-handle shape-handle-' + pos;
+      el.appendChild(h);
+      this._attachShapeResize(el, h, data);
+    });
+
+    // maniglia rotazione
+    const rotH = document.createElement('div');
+    rotH.className = 'shape-rotate-handle';
+    rotH.innerHTML = '⟳';
+    el.appendChild(rotH);
+    this._attachShapeRotate(el, rotH, data);
+
+    // bottone elimina
+    const delBtn = document.createElement('div');
+    delBtn.className = 'shape-delete-btn';
+    delBtn.textContent = '×';
+    delBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+    delBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this._removeShape(data.id);
+    });
+    el.appendChild(delBtn);
+
+    // Click sul corpo:
+    //   - se il secchiello è attivo, NON fare drag né selezione: lascia che
+    //     il click bolla fino a #card-canvas così il bucket handler colpisca
+    //     il path .colorable interno e lo colori via colorZone.
+    //   - altrimenti: seleziona (mostra maniglie) e avvia drag.
+    el.addEventListener('mousedown', (e) => {
+      if (e.target.classList.contains('shape-handle')   ||
+          e.target.classList.contains('shape-rotate-handle') ||
+          e.target.classList.contains('shape-delete-btn')) {
+        return;
+      }
+      const colorTool = window.tools && window.tools.color;
+      if (colorTool && colorTool.active && colorTool.activeTab === 'bucket') {
+        // lascia perdere drag: il click colorerà la forma via .colorable
+        return;
+      }
+      e.stopPropagation();
+      this._selectShape(data.id);
+      this._attachShapeMoveDrag(el, data, e);
+    });
+
+    canvas.appendChild(el);
+    return el;
+  },
+
+  /** Applica le trasformazioni (posizione, dimensione, rotazione) al DOM.
+   *  Tracciamo il CENTRO della forma; translate(-50%,-50%) sposta l'origine
+   *  così left/top corrispondono al centro e non bisogna calcolare l'altezza
+   *  (gli SVG con viewBox quadrato hanno aspect 1:1).
+   *  @private */
+  _applyShapeStyle(el, data) {
+    el.style.position = 'absolute';
+    el.style.left  = data.xPct + '%';
+    el.style.top   = data.yPct + '%';
+    el.style.width = data.widthPct + '%';
+    el.style.aspectRatio = '1 / 1';
+    el.style.transform = `translate(-50%, -50%) rotate(${data.rotation || 0}deg)`;
+  },
+
+  /** Drag del corpo: aggiorna xPct/yPct del centro. @private */
+  _attachShapeMoveDrag(el, data, startEvent) {
+    const canvas = document.getElementById('card-canvas');
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const cw = rect.width, ch = rect.height;
+    const startMouseX = startEvent.clientX;
+    const startMouseY = startEvent.clientY;
+    const startX = data.xPct;
+    const startY = data.yPct;
+    let moved = false;
+
+    const onMove = (e) => {
+      const dx = e.clientX - startMouseX;
+      const dy = e.clientY - startMouseY;
+      const dxPct = cw ? (dx / cw) * 100 : 0;
+      const dyPct = ch ? (dy / ch) * 100 : 0;
+      data.xPct = Math.max(0, Math.min(100, startX + dxPct));
+      data.yPct = Math.max(0, Math.min(100, startY + dyPct));
+      this._applyShapeStyle(el, data);
+      moved = true;
+    };
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      if (moved) this.saveSnapshot();
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  },
+
+  /** Resize uniforme da centro: stesso pattern delle foto. @private */
+  _attachShapeResize(el, handle, data) {
+    handle.addEventListener('mousedown', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+
+      const elRect = el.getBoundingClientRect();
+      const centerX = elRect.left + elRect.width / 2;
+      const centerY = elRect.top  + elRect.height / 2;
+      const d0 = Math.hypot(e.clientX - centerX, e.clientY - centerY) || 1;
+      const w0 = data.widthPct;
+      let moved = false;
+
+      const onMove = (ev) => {
+        const d = Math.hypot(ev.clientX - centerX, ev.clientY - centerY);
+        const scale = d / d0;
+        data.widthPct = Math.max(3, Math.min(95, w0 * scale));
+        this._applyShapeStyle(el, data);
+        moved = true;
+      };
+      const onUp = () => {
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        if (moved) this.saveSnapshot();
+      };
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+  },
+
+  /** Rotazione attorno al centro: stesso pattern delle foto. @private */
+  _attachShapeRotate(el, handle, data) {
+    handle.addEventListener('mousedown', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+
+      const elRect = el.getBoundingClientRect();
+      const centerX = elRect.left + elRect.width / 2;
+      const centerY = elRect.top  + elRect.height / 2;
+      const a0 = Math.atan2(e.clientY - centerY, e.clientX - centerX);
+      const r0 = data.rotation || 0;
+      let moved = false;
+
+      const onMove = (ev) => {
+        const a = Math.atan2(ev.clientY - centerY, ev.clientX - centerX);
+        const deltaDeg = ((a - a0) * 180) / Math.PI;
+        data.rotation = (r0 + deltaDeg) % 360;
+        this._applyShapeStyle(el, data);
+        moved = true;
+      };
+      const onUp = () => {
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        if (moved) this.saveSnapshot();
+      };
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+  },
+
+  /** Mostra le maniglie sulla forma selezionata. @private */
+  _selectShape(id) {
+    window.APP_STATE.selectedShapeId = id;
+    const canvas = document.getElementById('card-canvas');
+    if (!canvas) return;
+    canvas.querySelectorAll('.shape-el').forEach(el => {
+      el.classList.toggle('selected', el.dataset.id === id);
+    });
+  },
+
+  /** Deseleziona tutte le forme. @private */
+  _deselectAllShapes() {
+    window.APP_STATE.selectedShapeId = null;
+    const canvas = document.getElementById('card-canvas');
+    if (!canvas) return;
+    canvas.querySelectorAll('.shape-el.selected').forEach(el => {
+      el.classList.remove('selected');
+    });
+  },
+
+  /** Rimuove una forma da DOM, stato shapes e dal map dei colori. @private */
+  _removeShape(id) {
+    this.saveSnapshot();
+    const canvas = document.getElementById('card-canvas');
+    if (canvas) {
+      const el = canvas.querySelector(`.shape-el[data-id="${id}"]`);
+      if (el) el.remove();
+    }
+    if (Array.isArray(window.APP_STATE.shapes)) {
+      window.APP_STATE.shapes = window.APP_STATE.shapes.filter(s => s.id !== id);
+    }
+    if (window.APP_STATE.coloredZones && window.APP_STATE.coloredZones[id]) {
+      delete window.APP_STATE.coloredZones[id];
+    }
+    if (window.APP_STATE.selectedShapeId === id) {
+      window.APP_STATE.selectedShapeId = null;
+    }
+  },
+
+  /* =====================================================
      TESTI LIBERI — aggiungi / sposta / modifica / rimuovi
      ===================================================== */
 
@@ -1464,6 +1786,7 @@ window.editor = {
       } else {
         this.deselectAllTextElements();
         this._deselectAllPhotos();
+        this._deselectAllShapes();
       }
     });
   },
@@ -3109,7 +3432,8 @@ window.editor = {
         textElements: JSON.parse(JSON.stringify(state.textElements || [])),
         tapes:        JSON.parse(JSON.stringify(state.tapes        || [])),
         coloredZones: JSON.parse(JSON.stringify(state.coloredZones || {})),
-        photos:       JSON.parse(JSON.stringify(state.photos       || []))
+        photos:       JSON.parse(JSON.stringify(state.photos       || [])),
+        shapes:       JSON.parse(JSON.stringify(state.shapes       || []))
         // brushStrokes intenzionalmente escluso (troppo pesante)
       }
     };

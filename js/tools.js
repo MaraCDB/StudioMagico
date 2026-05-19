@@ -1919,3 +1919,115 @@ window.tools.photo = {
     });
   }
 };
+
+/* =========================================================
+   TOOL FORME  💠
+   Pannello con 20 forme geometriche. Click su una forma →
+   viene aggiunta al canvas come elemento ridimensionabile/
+   ruotabile/eliminabile, contiene un path .colorable col
+   suo proprio id così il secchiello la colora via il
+   fast-path SVG di colorZone (niente flood fill su pixel).
+   ========================================================= */
+window.tools.shape = {
+  buttonEl: null,
+  panelEl: null,
+  active: false,
+  _docClickHandler: null,
+
+  init() {
+    this.destroy();
+    const toolbar = document.getElementById('toolbar');
+    if (!toolbar) return;
+
+    // bottone toolbar
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'tool-btn';
+    btn.dataset.tool = 'shape';
+    btn.title = 'Inserisci una forma colorabile';
+    btn.innerHTML =
+      '<span class="tool-btn-icon" aria-hidden="true">💠</span>' +
+      '<span class="tool-btn-label">Forme</span>';
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.togglePanel();
+    });
+    toolbar.appendChild(btn);
+    this.buttonEl = btn;
+
+    // pannello
+    const panel = document.createElement('div');
+    panel.id = 'panel-shape';
+    panel.hidden = true;
+    panel.innerHTML = this._buildPanelHTML();
+    panel.addEventListener('click',     (e) => e.stopPropagation());
+    panel.addEventListener('mousedown', (e) => e.stopPropagation());
+    toolbar.appendChild(panel);
+    this.panelEl = panel;
+
+    this._bindPanelEvents();
+
+    // click esterno chiude il pannello
+    this._docClickHandler = () => {
+      if (this.panelEl && !this.panelEl.hidden) this._setOpen(false);
+    };
+    document.addEventListener('click', this._docClickHandler);
+  },
+
+  destroy() {
+    if (this.buttonEl) { this.buttonEl.remove(); this.buttonEl = null; }
+    if (this.panelEl)  { this.panelEl.remove();  this.panelEl  = null; }
+    if (this._docClickHandler) {
+      document.removeEventListener('click', this._docClickHandler);
+      this._docClickHandler = null;
+    }
+    this.active = false;
+  },
+
+  togglePanel() {
+    this._setOpen(!!(this.panelEl && this.panelEl.hidden));
+  },
+
+  _setOpen(open) {
+    this.active = open;
+    if (this.buttonEl) this.buttonEl.classList.toggle('active', open);
+    if (this.panelEl)  this.panelEl.hidden = !open;
+    if (open) window.tools.closeAllExcept('shape');
+  },
+
+  _buildPanelHTML() {
+    // legge il catalogo SHAPES esposto da editor.js (variabile const
+    // top-level, accessibile come window.SHAPES ? No: è solo const,
+    // non globale. Lo importiamo via window.editor che la riespone.)
+    const shapes = (window.editor && window.editor._SHAPES) || {};
+    const cells = Object.keys(shapes).map(key => {
+      const spec = shapes[key];
+      return `
+        <button type="button" class="shape-pick" data-shape="${key}" title="${spec.label}" aria-label="${spec.label}">
+          <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <path d="${spec.path}" fill="#FFFFFF" stroke="#2A2438" stroke-width="3" stroke-linejoin="round" vector-effect="non-scaling-stroke" />
+          </svg>
+        </button>
+      `;
+    }).join('');
+    return `
+      <div class="shape-panel-title">Scegli una forma</div>
+      <div class="shape-grid">${cells}</div>
+    `;
+  },
+
+  _bindPanelEvents() {
+    if (!this.panelEl) return;
+    this.panelEl.querySelectorAll('.shape-pick').forEach(b => {
+      b.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const key = b.dataset.shape;
+        if (window.editor && typeof window.editor.addShape === 'function') {
+          window.editor.addShape(key);
+        }
+        this._setOpen(false);
+      });
+    });
+  }
+};
+
