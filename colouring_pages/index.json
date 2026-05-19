@@ -4,17 +4,24 @@
     { "file": "gatto_casa.png",       "name": "Gatto a casa",       "category": "animali",  "emoji": "🐱" },
     { "file": "cane_passeggiata.png", "name": "Cane in passeggiata","category": "animali",  "emoji": "🐕" },
     { "file": "cane_parco.png",       "name": "Cane al parco",      "category": "animali",  "emoji": "🐕" },
+    { "file": "cane_seduto.png",      "name": "Cane seduto",        "category": "animali",  "emoji": "🐕" },
     { "file": "coniglio.png",         "name": "Coniglio",           "category": "animali",  "emoji": "🐰" },
     { "file": "gufo.png",             "name": "Gufo",               "category": "animali",  "emoji": "🦉" },
     { "file": "gufo2.png",            "name": "Gufo 2",             "category": "animali",  "emoji": "🦉" },
+    { "file": "coccinella.png",       "name": "Coccinella",         "category": "animali",  "emoji": "🐞" },
+    { "file": "farfalle.png",         "name": "Farfalle",           "category": "animali",  "emoji": "🦋" },
     { "file": "torta.png",            "name": "Torta",              "category": "festa",    "emoji": "🎂" },
     { "file": "torta_semplice.png",   "name": "Torta semplice",     "category": "festa",    "emoji": "🎂" },
     { "file": "torta1.png",           "name": "Torta 1",            "category": "festa",    "emoji": "🎂" },
     { "file": "torta2.png",           "name": "Torta 2",            "category": "festa",    "emoji": "🎂" },
     { "file": "palloncini.png",       "name": "Palloncini",         "category": "festa",    "emoji": "🎈" },
     { "file": "regali.png",           "name": "Regali",             "category": "festa",    "emoji": "🎁" },
+    { "file": "bambini.png",          "name": "Bambini",            "category": "festa",    "emoji": "👧" },
     { "file": "castello.png",         "name": "Castello",           "category": "fantasia", "emoji": "🏰" },
     { "file": "arcobaleno.png",       "name": "Arcobaleno",         "category": "fantasia", "emoji": "🌈" },
-    { "file": "parco.png",            "name": "Parco",              "category": "natura",   "emoji": "🌳" }
+    { "file": "parco.png",            "name": "Parco",              "category": "natura",   "emoji": "🌳" },
+    { "file": "alberi.png",           "name": "Alberi",             "category": "natura",   "emoji": "🌲" },
+    { "file": "fiori.png",            "name": "Fiori",              "category": "natura",   "emoji": "🌸" },
+    { "file": "sole.png",             "name": "Sole",               "category": "natura",   "emoji": "☀️" }
   ]
 }

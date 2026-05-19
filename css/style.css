@@ -3155,18 +3155,20 @@ body.mode-my-tpls .step-bar {
 
 .colora-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 14px;
 }
+
+/* Card quadrata, l'immagine la riempie centrata (object-fit: cover) — il nome
+   è disponibile come tooltip e per screen reader via title + aria-label. */
 .colora-card {
   background: #FFF;
   border: 3px solid #E0CFF7;
   border-radius: 16px;
-  padding: 18px 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
   cursor: pointer;
   transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
@@ -3177,50 +3179,24 @@ body.mode-my-tpls .step-bar {
   box-shadow: 0 8px 20px rgba(199, 125, 255, 0.25);
   outline: none;
 }
-
 .colora-card.selected {
   border-color: #FF6B9D;
-  background: linear-gradient(135deg, rgba(255, 107, 157, 0.08), rgba(199, 125, 255, 0.08));
-  box-shadow: 0 0 0 4px rgba(255, 107, 157, 0.2);
+  box-shadow: 0 0 0 4px rgba(255, 107, 157, 0.25);
   transform: translateY(-2px);
 }
-.colora-card.selected .colora-card-thumb {
-  border-color: #FF6B9D;
-}
-
-/* override del display:flex sopra: senza questo il browser ignora l'attributo
-   [hidden] (specificità della regola UA-default più bassa della nostra) e
-   il filtro categoria non nasconderebbe nulla */
+/* override del display:block implicito: senza questo l'attributo [hidden]
+   verrebbe ignorato dal cascade e il filtro categoria non nasconderebbe nulla */
 .colora-card[hidden] {
   display: none;
 }
-.colora-card-emoji { font-size: 42px; line-height: 1; }
 
-/* anteprima del disegno (raster) generata da scripts/optimize-coloring-pages.mjs */
 .colora-card-thumb {
   display: block;
   width: 100%;
-  max-width: 160px;
-  height: auto;
-  max-height: 200px;
-  object-fit: contain;
-  border-radius: 10px;
-  background: #FFFFFF;
-  border: 1px solid #EFE5FB;
-}
-
-.colora-card-name {
-  font: 600 14px 'Baloo 2', sans-serif;
-  color: #2A2438;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-}
-.colora-card-name-emoji {
-  font-size: 16px;
-  line-height: 1;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  background: #FFF;
 }
 
 .colora-upload-row {
@@ -3235,12 +3211,9 @@ body.mode-my-tpls .step-bar {
 
 @media (max-width: 600px) {
   .colora-grid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
     gap: 10px;
   }
-  .colora-card { padding: 12px 8px; }
-  .colora-card-emoji { font-size: 32px; }
-  .colora-card-name { font-size: 13px; }
 }
 
 /* ===== FOTO — elementi caricati dall'utente sul canvas ===== */

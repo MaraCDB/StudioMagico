@@ -462,25 +462,21 @@ function renderColoraGallery(drawings) {
   ` : '';
 
   const cardsHtml = drawings.map((d) => {
-    // thumb in colouring_pages/thumbs/<basename>.png se file è PNG/JPG/JFIF;
-    // per SVG non c'è thumb generato (fallback all'emoji)
-    const ext = (d.file.split('.').pop() || '').toLowerCase();
+    // thumb in colouring_pages/thumbs/<basename>.png
     const base = d.file.replace(/\.[^.]+$/, '');
-    const hasThumb = ['png', 'jpg', 'jpeg', 'jfif'].includes(ext);
-    const thumbUrl = hasThumb ? `colouring_pages/thumbs/${base}.png` : null;
-    const visual = thumbUrl
-      ? `<img class="colora-card-thumb" src="${escapeHtml(thumbUrl)}" alt="" loading="lazy" />`
-      : `<span class="colora-card-emoji">${escapeHtml(d.emoji || '🎨')}</span>`;
+    const thumbUrl = `colouring_pages/thumbs/${base}.png`;
+    const name = escapeHtml(d.name || d.file);
+    // titolo + aria-label danno il nome a screen reader e tooltip hover senza
+    // dover scrivere il testo sotto la card
     return `
       <div class="colora-card"
            data-file="${escapeHtml(d.file)}"
            data-category="${escapeHtml(d.category || '')}"
+           title="${name}"
+           aria-label="${name}"
            role="button" tabindex="0">
-        ${visual}
-        <span class="colora-card-name">
-          <span class="colora-card-name-emoji" aria-hidden="true">${escapeHtml(d.emoji || '')}</span>
-          ${escapeHtml(d.name || d.file)}
-        </span>
+        <img class="colora-card-thumb" src="${escapeHtml(thumbUrl)}"
+             alt="${name}" loading="lazy" />
       </div>
     `;
   }).join('');
